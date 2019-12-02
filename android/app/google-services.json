@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "890169830307",
+    "firebase_url": "https://skillbox-c3901.firebaseio.com",
+    "project_id": "skillbox-c3901",
+    "storage_bucket": "skillbox-c3901.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:890169830307:android:0f91bdde01b2cc091bc816",
+        "android_client_info": {
+          "package_name": "br.ifba.edu.skill_box"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "890169830307-87qb7itrbb8dfupgamq230rfn2uju1qr.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "br.ifba.edu.skill_box",
+            "certificate_hash": "4cb34294112a65a00b687e7d3ffca00a8ddfbcb7"
+          }
+        },
+        {
+          "client_id": "890169830307-mtggk285143kirauuo9ueqpm0un4222r.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCygn7mYmWZU7DxEjAfg7hYX22rLog__LM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "890169830307-mtggk285143kirauuo9ueqpm0un4222r.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
