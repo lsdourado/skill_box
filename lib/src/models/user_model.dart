@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:skill_box/src/datas/interest.dart';
+import 'package:skill_box/src/datas/project.dart';
 import 'package:skill_box/src/datas/user.dart';
 
 class UserModel extends Model{
@@ -71,6 +72,7 @@ class UserModel extends Model{
 
   Future<Null> _loadCurrentUser() async {
     isLoading = true;
+    notifyListeners();
     if(user == null)
       user = User(await _firebase.currentUser());
       if(user != null){
@@ -79,13 +81,18 @@ class UserModel extends Model{
             DocumentSnapshot docUser = await Firestore.instance.collection("usuarios").
             document(user.userId).get();
 
-            QuerySnapshot query = await _firestore.collection("usuarios").document(user.userId).collection("interesses").getDocuments();
-
             if(docUser.data != null)
               user.fromDocument(docUser);
 
+            QuerySnapshot query = await _firestore.collection("usuarios").document(user.userId).collection("interesses").getDocuments();
+
             if(query.documents != null)
               user.interesses = query.documents.map((doc) => Interest.fromDocument(doc, true, doc.data["categoryId"])).toList();
+
+            query = await _firestore.collection("usuarios").document(user.userId).collection("projetos").getDocuments();
+
+            if(query.documents != null)
+              user.projetos = query.documents.map((doc) => Project.fromDocument(doc)).toList();
           }
         }
       }
@@ -93,18 +100,28 @@ class UserModel extends Model{
       notifyListeners();
   }
 
+  Future<Null> reloadProjects() async {
+    isLoading = true;
+    notifyListeners();
+
+    QuerySnapshot query = await _firestore.collection("usuarios").document(user.userId).collection("projetos").getDocuments();
+
+    if(query.documents != null)
+      user.projetos = query.documents.map((doc) => Project.fromDocument(doc)).toList();
+
+    isLoading = false;
+    notifyListeners();
+  }
+
   bool userHasProfile(){
     if(user.interesses != null && user.interesses.isNotEmpty){
       return true;
-    }else {
+    }else{
       return false;
     }
   }
  
   Future<Null> saveUserProfile({@required Map<String, dynamic> userData, @required List<Interest> interestList,@required VoidCallback onSuccess, @required VoidCallback onFail}) async {
-    isLoading = true;
-    notifyListeners();
-
     await _firestore.collection("usuarios").document(user.userId).setData(userData).then(
       (result) async {
 
@@ -137,7 +154,6 @@ class UserModel extends Model{
 
         onSuccess();
 
-        isLoading = false;
         notifyListeners();
       }
     ).catchError((e){

@@ -3,6 +3,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:skill_box/src/models/user_model.dart';
 import 'package:skill_box/src/screens/home_screen.dart';
+import 'package:skill_box/src/tabs/profile_tab.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -46,9 +47,15 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void _onSuccess(){
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute(builder: (context)=>HomeScreen())
-    );
+    if(UserModel.of(context).userHasProfile()){
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context)=>HomeScreen())
+      );
+    }else{
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context)=>ProfileTab())
+      );
+    }
   }
 
   void _onFail(){

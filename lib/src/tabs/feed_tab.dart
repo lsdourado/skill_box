@@ -9,6 +9,10 @@ class _FeedTabState extends State<FeedTab> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text("Home"),
+        centerTitle: true,
+      ),
       body: Container(
         child: Center(
           child: Text("feed"),

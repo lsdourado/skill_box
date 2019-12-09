@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:skill_box/src/datas/Interest_category.dart';
 import 'package:skill_box/src/datas/interest.dart';
-import 'package:skill_box/src/models/user_model.dart';
 
 class InterestModel extends Model{
   final _firestore = Firestore.instance;
@@ -16,7 +15,7 @@ class InterestModel extends Model{
 
   static InterestModel of(BuildContext context) => ScopedModel.of<InterestModel>(context);
 
-   @override
+  @override
   void addListener(VoidCallback listener) {
     super.addListener(listener);
 
@@ -25,6 +24,7 @@ class InterestModel extends Model{
 
   Future<Null> _loadInterestsCategories() async {
     isLoading = true;
+    notifyListeners();
 
     QuerySnapshot query = await _firestore.collection("interesses").getDocuments();
 
@@ -33,7 +33,6 @@ class InterestModel extends Model{
     _loadInterestsItems(query);
 
     isLoading = false;
-
     notifyListeners();
   }
 
@@ -54,17 +53,19 @@ class InterestModel extends Model{
   }
 
   bool isCategorySelected(InterestCategory category){
-    userInterestsSelected.map(
-      (interest){
-        if(category.categoryId == interest.categoryId){
-          if(interest.isSelected){
-            category.isSelected = true;
-          }else{
-            category.isSelected = false;
+    if(userInterestsSelected != null){
+      userInterestsSelected.map(
+        (interest){
+          if(category.categoryId == interest.categoryId){
+            if(interest.isSelected){
+              category.isSelected = true;
+            }else{
+              category.isSelected = false;
+            }
           }
         }
-      }
-    ).toList();
+      ).toList();
+    }
 
     return category.isSelected;
   }
@@ -85,5 +86,9 @@ class InterestModel extends Model{
       interest.isSelected = !interest.isSelected;
     }
     notifyListeners();
+  }
+
+  void clearSelections(){
+    _loadInterestsCategories();
   }
 }

@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:skill_box/src/datas/interest.dart';
+import 'package:skill_box/src/datas/project.dart';
 
 class User {
   String userId;
@@ -11,6 +12,7 @@ class User {
   String sobre;
   String telefone;
   List<Interest> interesses;
+  List<Project> projetos;
 
   User(FirebaseUser firebaseUser){
     this.userId = firebaseUser?.uid;
