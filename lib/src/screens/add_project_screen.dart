@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:keyboard_visibility/keyboard_visibility.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:skill_box/src/datas/interest.dart';
 import 'package:skill_box/src/datas/user.dart';
@@ -20,27 +21,37 @@ class _AddProjectScreen extends State<AddProjectScreen> {
 
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
-  
+
+  InterestModel _interestModel;
+
+  @override
+  void initState() {
+    super.initState();
+    _interestModel = InterestModel.of(context);
+    _interestModel.clearSelections();
+
+    KeyboardVisibilityNotification().addNewListener(
+      onHide: () {
+        FocusScopeNode currentFocus = FocusScope.of(context);
+
+        if(!currentFocus.hasPrimaryFocus) {
+          currentFocus.unfocus();
+        }
+      }
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () {
-        _focusDismiss();
-      },
-
       child: Scaffold(
         key: _scaffoldKey,
         appBar: AppBar(
           title: Text("Novo projeto"),
           centerTitle: true,
         ),
-        body: ScopedModelDescendant<InterestModel>(
-          builder: (context, child, model) {
-            if(model.isLoading)
-                return Center(child: CircularProgressIndicator());
-            else{
-              return Form(
+        body: _interestModel.isLoading ? Center(child: CircularProgressIndicator()) :
+          Form(
                 key: _formKey,
                 child: ListView(
                   padding: EdgeInsets.fromLTRB(16.0, 25.0, 16.0, 25.0),
@@ -83,7 +94,7 @@ class _AddProjectScreen extends State<AddProjectScreen> {
                             child: ExpansionTile(
                               title: Text("Áreas de interesse"),
                               leading: Icon(Icons.list),
-                              children: model.interestCategories.map(
+                              children: _interestModel.interestCategories.map(
                                 (category){
                                   return Ink(
                                     child: ExpansionTile(
@@ -117,7 +128,9 @@ class _AddProjectScreen extends State<AddProjectScreen> {
                                                 )
                                               );
                                             }else{
-                                              return Container();
+                                              return Container(
+                                                child: Text("Essa categoria não possui itens ainda"),
+                                              );
                                             }
                                           },
                                         )
@@ -199,20 +212,9 @@ class _AddProjectScreen extends State<AddProjectScreen> {
                     
                   ],
                 ),
-              );
-            }
-          },
-        )
+              )
       )
     );
-  }
-
-  void _focusDismiss(){
-    FocusScopeNode currentFocus = FocusScope.of(context);
-
-    if(!currentFocus.hasPrimaryFocus) {
-      currentFocus.unfocus();
-    }
   }
 
   void onSuccess(){

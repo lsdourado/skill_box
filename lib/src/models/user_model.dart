@@ -17,6 +17,7 @@ class UserModel extends Model{
   User user;
 
   bool isLoading = false;
+  bool userLoggedIn = false;
 
   static UserModel of(BuildContext context) => ScopedModel.of<UserModel>(context);
 
@@ -56,7 +57,8 @@ class UserModel extends Model{
   }
 
   Future<bool> isLoggedIn() async {
-    return await _firebase.currentUser() != null;
+    userLoggedIn = await _firebase.currentUser() != null;
+    return userLoggedIn;
   }
 
   void signOut() async {
@@ -65,6 +67,7 @@ class UserModel extends Model{
     await _firebase.signOut();
 
     user = null;
+    userLoggedIn = false;
 
     isLoading = false;
     notifyListeners();

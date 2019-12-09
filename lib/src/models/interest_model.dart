@@ -11,7 +11,7 @@ class InterestModel extends Model{
 
   List<InterestCategory> interestCategories = [];
 
-  List<Interest> userInterestsSelected = [];
+  List<Interest> interestsSelected = [];
 
   static InterestModel of(BuildContext context) => ScopedModel.of<InterestModel>(context);
 
@@ -47,14 +47,14 @@ class InterestModel extends Model{
   }
 
   void setUserInterests(List<Interest> userInterests){
-    userInterestsSelected = userInterests;
+    interestsSelected = userInterests;
 
     notifyListeners();
   }
 
   bool isCategorySelected(InterestCategory category){
-    if(userInterestsSelected != null){
-      userInterestsSelected.map(
+    if(interestsSelected != null){
+      interestsSelected.map(
         (interest){
           if(category.categoryId == interest.categoryId){
             if(interest.isSelected){
@@ -73,7 +73,7 @@ class InterestModel extends Model{
   void onTapInterest(Interest interest){
     bool find = false;
 
-    userInterestsSelected.map(
+    interestsSelected.map(
       (userInterest){
         if(userInterest.interestId == interest.interestId){
           userInterest.isSelected = !userInterest.isSelected;
@@ -89,6 +89,17 @@ class InterestModel extends Model{
   }
 
   void clearSelections(){
-    _loadInterestsCategories();
+    interestsSelected = [];
+
+    interestCategories.map(
+      (category){
+        category.isSelected = false;
+        category.interests.map(
+          (interest){
+            interest.isSelected = false;
+          }
+        ).toList();
+      }
+    ).toList();
   }
 }
