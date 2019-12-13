@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:skill_box/src/models/project_model.dart';
 import 'package:skill_box/src/models/user_model.dart';
+import 'package:skill_box/src/screens/edit_project_screen.dart';
 
 class MyProjectsTab extends StatefulWidget {
   @override
@@ -9,11 +11,13 @@ class MyProjectsTab extends StatefulWidget {
 class _MyProjectsTab extends State<MyProjectsTab> {
 
   UserModel _userModel;
+  ProjectModel _projectModel;
 
   @override
   void initState() {
     super.initState();
     _userModel = UserModel.of(context);
+    _projectModel = ProjectModel.of(context);
   }
   
   @override
@@ -26,7 +30,7 @@ class _MyProjectsTab extends State<MyProjectsTab> {
         return Center(child: Text("Você não possui projetos ainda"));
 
       else{
-        return Column(
+        return ListView(
           children: <Widget>[
             Row(
               children: <Widget>[
@@ -51,8 +55,10 @@ class _MyProjectsTab extends State<MyProjectsTab> {
                   (project){
                     if(project.adminId == _userModel.user.userId){
                       return GestureDetector(
-                        onTap: (){
-                          print(project.titulo);
+                        onTap: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(builder: (context)=>EditProjectScreen())
+                          );
                         },
                         child: Container(
                           width: 300.0,

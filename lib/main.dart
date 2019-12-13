@@ -7,6 +7,8 @@ import 'package:skill_box/src/screens/home_screen.dart';
 import 'package:skill_box/src/screens/login_screen.dart';
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized(); 
+  
   UserModel userModel = new UserModel();
   bool isLoggedIn = await userModel.isLoggedIn();
 
@@ -14,20 +16,28 @@ void main() async {
     ScopedModel<UserModel>(
       model: userModel,
       child: ScopedModelDescendant<UserModel>(
-        builder: (context, child, model) {
+        builder: (context, child, userModel) {
           return ScopedModel<InterestModel>(
             model: InterestModel(),
-            child: ScopedModel<ProjectModel>(
-              model: ProjectModel(),
-              child: MaterialApp(
-                title: "Skill Box",
-                theme: ThemeData(
-                  primarySwatch: Colors.blue,
-                  primaryColor: Colors.lightBlue,
-                ),
-                debugShowCheckedModeBanner: false,
-                home: isLoggedIn ? HomeScreen() : LoginScreen(),
-              ),
+            child: ScopedModelDescendant<InterestModel>(
+              builder: (context, child, interestModel){
+                return ScopedModel<ProjectModel>(
+                  model: ProjectModel(userModel),
+                  child: ScopedModelDescendant<ProjectModel>(
+                    builder: (context, child, projectModel){
+                      return MaterialApp(
+                        title: "Skill Box",
+                        theme: ThemeData(
+                          primarySwatch: Colors.blue,
+                          primaryColor: Colors.lightBlue,
+                        ),
+                        debugShowCheckedModeBanner: false,
+                        home: isLoggedIn ? HomeScreen() : LoginScreen(),
+                      );
+                    },
+                  ),
+                );
+              }
             )
           );
         },

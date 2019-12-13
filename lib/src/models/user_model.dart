@@ -9,10 +9,9 @@ import 'package:skill_box/src/datas/user.dart';
 
 class UserModel extends Model{
 
-  final _firebase = FirebaseAuth.instance;
+  final _firebaseAuth = FirebaseAuth.instance;
   final _firestore = Firestore.instance;
-  final google = GoogleSignIn();
-  FirebaseUser firebaseUser;
+  final _googleSignIn = GoogleSignIn();
 
   User user;
 
@@ -34,13 +33,18 @@ class UserModel extends Model{
     isLoading = true;
     notifyListeners();
 
-    final googleAuthentication = await google.signIn();
-    final authenticated = await googleAuthentication.authentication;
+    final googleUser = await _googleSignIn.signIn();
+    final googleAuth = await googleUser.authentication;
 
-    await _firebase.signInWithGoogle(idToken: authenticated?.idToken, accessToken: authenticated?.accessToken).then(
+    final AuthCredential credential = GoogleAuthProvider.getCredential(
+      accessToken: googleAuth.accessToken,
+      idToken: googleAuth.idToken,
+    );
+
+    await _firebaseAuth.signInWithCredential(credential).then(
       (fireUser) async {
 
-        user = User(fireUser);
+        user = User(fireUser.user);
 
         await _loadCurrentUser();
 
@@ -48,7 +52,8 @@ class UserModel extends Model{
 
         isLoading = false;
         notifyListeners();
-    }).catchError((e){
+      }
+    ).catchError((e){
       onFail();
       print(e);
       isLoading = false;
@@ -57,14 +62,14 @@ class UserModel extends Model{
   }
 
   Future<bool> isLoggedIn() async {
-    userLoggedIn = await _firebase.currentUser() != null;
+    userLoggedIn = await _firebaseAuth.currentUser() != null;
     return userLoggedIn;
   }
 
   void signOut() async {
     isLoading = true;
-    await google.signOut();
-    await _firebase.signOut();
+    await _googleSignIn.signOut();
+    await _firebaseAuth.signOut();
 
     user = null;
     userLoggedIn = false;
@@ -77,7 +82,7 @@ class UserModel extends Model{
     isLoading = true;
     notifyListeners();
     if(user == null)
-      user = User(await _firebase.currentUser());
+      user = User(await _firebaseAuth.currentUser());
       if(user != null){
         if(user.interesses == null){
           if(await isLoggedIn()){
@@ -99,8 +104,8 @@ class UserModel extends Model{
           }
         }
       }
-      isLoading = false;
-      notifyListeners();
+    isLoading = false;
+    notifyListeners();
   }
 
   Future<Null> reloadProjects() async {
@@ -150,7 +155,7 @@ class UserModel extends Model{
           }
         ).toList();
 
-        user.email_secundario = userData["email_secundario"];
+        user.emailSecundario = userData["email_secundario"];
         user.telefone = userData["telefone"];
         user.sobre = userData["sobre"];
         user.interesses = newInterests;

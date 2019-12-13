@@ -35,7 +35,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     model.signIn(
                       onSuccess: _onSuccess,
                       onFail: _onFail
-                    );                  
+                    );                
                   }
                 );
               },

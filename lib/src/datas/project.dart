@@ -7,8 +7,10 @@ class Project {
   String projectId;
   String titulo;
   String descricao;
-  List<User> participantes;
-  List<Interest> interesses;
+  List<User> membros = [];
+  List<Interest> interesses = [];
+
+  Project(this.adminId, this.projectId, this.titulo, this.descricao);
 
   Project.fromDocument(DocumentSnapshot document) {
     projectId = document.documentID;

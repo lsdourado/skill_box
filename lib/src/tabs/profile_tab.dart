@@ -35,7 +35,7 @@ class _ProfileTabState extends State<ProfileTab> {
 
     _interestModel.setUserInterests(_userModel.user?.interesses);
 
-    _emailController.text = _userModel.user?.email_secundario;
+    _emailController.text = _userModel.user?.emailSecundario;
     _phoneController.text = _userModel.user?.telefone;
     _aboutController.text  = _userModel.user?.sobre;
 
@@ -114,9 +114,6 @@ class _ProfileTabState extends State<ProfileTab> {
                         borderRadius: BorderRadius.circular(15.0)
                       )
                     ),
-                    validator: (text){
-                      if(text.isEmpty) return "Campo obrigatório";
-                    },
                     keyboardType: TextInputType.phone,
                   ),
                 ),

@@ -8,7 +8,7 @@ class User {
   String urlFoto;
   String nome;
   String email;
-  String email_secundario;
+  String emailSecundario;
   String sobre;
   String telefone;
   List<Interest> interesses;
@@ -22,7 +22,10 @@ class User {
   }
 
   void fromDocument(DocumentSnapshot docUser) {
-    email_secundario = docUser.data["email_secundario"];
+    userId = docUser.documentID;
+    nome = docUser.data["nome"];
+    email = docUser.data["email"];
+    emailSecundario = docUser.data["email_secundario"];
     telefone = docUser.data["telefone"];
     sobre = docUser.data["sobre"];
   }
@@ -32,7 +35,7 @@ class User {
       "userId": userId,
       "nome": nome,
       "email": email,
-      "email_secundario": email_secundario,
+      "emailSecundario": emailSecundario,
       "sobre": sobre,
       "telefone": telefone,
     };

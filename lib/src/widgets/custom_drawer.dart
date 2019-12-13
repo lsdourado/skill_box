@@ -55,7 +55,7 @@ class CustomDrawer extends StatelessWidget {
                   child: FloatingActionButton(
                   onPressed: (){
                     _userModel.signOut();
-                    Navigator.of(context).pushReplacement(
+                    Navigator.of(context).push(
                       MaterialPageRoute(builder: (context)=>LoginScreen())
                     );
                   },
