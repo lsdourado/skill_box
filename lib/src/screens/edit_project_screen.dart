@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:keyboard_visibility/keyboard_visibility.dart';
 import 'package:scoped_model/scoped_model.dart';
@@ -27,12 +28,6 @@ class _EditProjectScreen extends State<EditProjectScreen> {
   @override
   void initState() {
     super.initState();
-    _interestModel = InterestModel.of(context);
-    _interestModel.clearSelections();
-
-    _projectModel = ProjectModel.of(context);
-
-    print(_projectModel.project.titulo);
 
     KeyboardVisibilityNotification().addNewListener(
       onHide: () {
@@ -43,6 +38,14 @@ class _EditProjectScreen extends State<EditProjectScreen> {
         }
       }
     );
+
+    _interestModel = InterestModel.of(context);
+    _interestModel.clearSelections();
+
+    _projectModel = ProjectModel.of(context);
+    
+    _titleController.text = ProjectModel.project?.titulo;
+    _descriptionController.text = ProjectModel.project?.descricao;
   }
 
   @override
@@ -189,10 +192,11 @@ class _EditProjectScreen extends State<EditProjectScreen> {
                                   ).toList();
 
                                   Map<String, dynamic> projectData = {
-                                    "projectId": _projectModel.project.projectId,
-                                    "adminId": UserModel.of(context).user?.userId,
+                                    "adminId": _projectModel.userModel.user.userId,
+                                    "projectId": ProjectModel.project.projectId,
                                     "titulo": _titleController.text,
                                     "descricao": _descriptionController.text,
+                                    "data_criacao": ProjectModel.project.dataCriacao
                                   };
 
                                   ProjectModel.of(context).saveProject(
@@ -218,7 +222,6 @@ class _EditProjectScreen extends State<EditProjectScreen> {
 
   void onSuccess(){
     Navigator.pop(context);
-    UserModel.of(context).reloadProjects();
   }
 
   void onFail(){

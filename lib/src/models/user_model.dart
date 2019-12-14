@@ -20,7 +20,7 @@ class UserModel extends Model{
 
   static UserModel of(BuildContext context) => ScopedModel.of<UserModel>(context);
 
-   @override
+  @override
   void addListener(VoidCallback listener) {
     super.addListener(listener);
 
@@ -99,8 +99,7 @@ class UserModel extends Model{
 
             query = await _firestore.collection("usuarios").document(user.userId).collection("projetos").getDocuments();
 
-            if(query.documents != null)
-              user.projetos = query.documents.map((doc) => Project.fromDocument(doc)).toList();
+            await loadProjects();
           }
         }
       }
@@ -108,17 +107,37 @@ class UserModel extends Model{
     notifyListeners();
   }
 
-  Future<Null> reloadProjects() async {
-    isLoading = true;
-    notifyListeners();
+  Future<Null> loadProjects() async {
 
-    QuerySnapshot query = await _firestore.collection("usuarios").document(user.userId).collection("projetos").getDocuments();
+    QuerySnapshot query = await _firestore.collection("usuarios").document(user.userId).collection("projetos").orderBy('data_criacao', descending: false).getDocuments();
 
-    if(query.documents != null)
+    if(query.documents != null){
       user.projetos = query.documents.map((doc) => Project.fromDocument(doc)).toList();
 
-    isLoading = false;
-    notifyListeners();
+      user.projetos.map(
+        (project) async {
+         query = await _firestore.collection("projetos").document(project.projectId).collection("interesses").getDocuments();
+
+         query.documents.map(
+           (doc){
+             project.interesses = query.documents.map((doc) => Interest.fromDocument(doc, true, doc.data["categoryId"])).toList();
+           }
+         ).toList();
+
+         query = await _firestore.collection("projetos").document(project.projectId).collection("membros").getDocuments();
+
+         query.documents.map(
+           (doc){
+             User user = User(null);
+
+             user.fromDocument(doc);
+
+             project.membros.add(user);
+           }
+         ).toList();
+        }
+      ).toList();
+    }
   }
 
   bool userHasProfile(){

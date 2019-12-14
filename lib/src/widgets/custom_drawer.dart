@@ -19,53 +19,66 @@ class CustomDrawer extends StatelessWidget {
         ListView(
               padding: EdgeInsets.symmetric(horizontal: 15.0, vertical: 50.0),
               children: <Widget>[
+                _userModel.isLoading ? 
+                Center(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: <Widget>[
+                      CircularProgressIndicator()
+                    ]
+                  )
+                ) :
                 Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    CircleAvatar(
-                      radius: 35.0,
-                      backgroundColor: Colors.grey[400],
-                      foregroundColor: Colors.black,
-                      backgroundImage: _userModel.user != null ? NetworkImage(_userModel.user.urlFoto) : Icon(Icons.person),
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        CircleAvatar(
+                          radius: 35.0,
+                          backgroundColor: Colors.grey[400],
+                          foregroundColor: Colors.black,
+                          backgroundImage: _userModel.user != null ? NetworkImage(_userModel.user.urlFoto) : Icon(Icons.person),
+                        ),
+                        SizedBox(height: 10.0),
+                        Text(
+                          _userModel.user?.nome,
+                          style: TextStyle(
+                            fontSize: 13.0,
+                            fontWeight: FontWeight.w500
+                          ),
+                        ),
+                        SizedBox(height: 2.0),
+                        Text(
+                          _userModel.user?.email,
+                          style: TextStyle(
+                            fontSize: 13.0,
+                            fontWeight: FontWeight.w500
+                          ),
+                        ),
+                      ],
                     ),
-                    SizedBox(height: 10.0),
-                    Text(
-                      _userModel.user?.nome,
-                      style: TextStyle(
-                        fontSize: 13.0,
-                        fontWeight: FontWeight.w500
+                    Divider(),
+                    DrawerTile(Icons.home,"Início", pageController, 0),
+                    DrawerTile(Icons.featured_play_list,"Projetos", pageController, 1),
+                    DrawerTile(Icons.person,"Perfil", pageController, 2),
+                    Align(
+                      alignment: Alignment.bottomRight,
+                      child: FloatingActionButton(
+                      onPressed: (){
+                        _userModel.signOut();
+                        Navigator.of(context).push(
+                          MaterialPageRoute(builder: (context)=>LoginScreen())
+                        );
+                      },
+                      child: Icon(
+                        Icons.exit_to_app,
+                        size: 20.0
                       ),
+                      mini: true,
+                      backgroundColor: Colors.redAccent,
                     ),
-                    SizedBox(height: 2.0),
-                    Text(
-                      _userModel.user?.email,
-                      style: TextStyle(
-                        fontSize: 13.0,
-                        fontWeight: FontWeight.w500
-                      ),
-                    ),
+                    )
                   ],
-                ),
-                Divider(),
-                DrawerTile(Icons.home,"Início", pageController, 0),
-                DrawerTile(Icons.featured_play_list,"Projetos", pageController, 1),
-                DrawerTile(Icons.person,"Perfil", pageController, 2),
-                Align(
-                  alignment: Alignment.bottomRight,
-                  child: FloatingActionButton(
-                  onPressed: (){
-                    _userModel.signOut();
-                    Navigator.of(context).push(
-                      MaterialPageRoute(builder: (context)=>LoginScreen())
-                    );
-                  },
-                  child: Icon(
-                    Icons.exit_to_app,
-                    size: 20.0
-                  ),
-                  mini: true,
-                  backgroundColor: Colors.redAccent,
-                ),
                 )
               ],
             ) :

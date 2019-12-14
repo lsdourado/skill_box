@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:skill_box/src/datas/interest.dart';
 import 'package:skill_box/src/datas/project.dart';
-import 'package:skill_box/src/datas/user.dart';
 import 'package:skill_box/src/models/user_model.dart';
 
 class ProjectModel extends Model{
@@ -12,7 +11,7 @@ class ProjectModel extends Model{
 
   bool isLoading = false;
 
-  Project project;
+  static Project project;
 
   ProjectModel(this.userModel);
 
@@ -23,41 +22,24 @@ class ProjectModel extends Model{
     super.addListener(listener);
   }
 
-  Future<Null> loadProjectInfo(Project p) async {
-    project = p;
-
+  void setEditingProject(Project p){
     isLoading = true;
     notifyListeners();
 
-    QuerySnapshot query = await _firestore.collection("projetos").document(project.projectId).collection("interesses").getDocuments();
-
-    if(query.documents != null){
-      project.interesses = query.documents.map((doc) => Interest.fromDocument(doc, true, doc.data["categoryId"])).toList();
-    }
-
-    query = await _firestore.collection("projetos").document(project.projectId).collection("membros").getDocuments();
-
-    if(query.documents != null){
-      query.documents.map(
-        (doc){
-          User user = User(null);
-
-          user.fromDocument(doc);
-
-          project.membros.add(user);
-        }
-      ).toList();
-    }
+    project = p;
 
     isLoading = false;
     notifyListeners();
   }
 
+
   Future<Null> addProject({@required Map<String, dynamic> projectData, @required List<Interest> interestList,@required VoidCallback onSuccess, @required VoidCallback onFail}) async {
-    projectData["adminId"] = userModel.user.userId;
+    isLoading = true;
+    notifyListeners();
 
     await _firestore.collection("projetos").add(projectData).then(
       (result) async {
+        projectData["projectId"] = result.documentID;
 
         interestList.map(
           (interest) async {
@@ -68,16 +50,16 @@ class ProjectModel extends Model{
           }
         ).toList();
 
-        await _firestore.collection("projetos").document(result.documentID).collection("membros").document(projectData["adminId"]).setData(userModel.user.toMap());
+        await _firestore.collection("projetos").document(result.documentID).collection("membros").document(projectData["adminId"]).setData(userModel.user?.toMap());
 
-        await _firestore.collection("usuarios").document(userModel.user.userId).collection("projetos").document(result.documentID).setData(projectData);
+        await _firestore.collection("usuarios").document(userModel.user?.userId).collection("projetos").document(result.documentID).setData(projectData);
 
-        project = Project(projectData["adminId"], result.documentID, projectData["titulo"], projectData["descricao"]);
+        userModel.loadProjects();
 
-        userModel.user.projetos.add(project);
-        
         onSuccess();
 
+        userModel.notifyListeners();
+        isLoading = false;
         notifyListeners();
       }
     ).catchError((e){
@@ -96,10 +78,11 @@ class ProjectModel extends Model{
 
         await _firestore.collection("usuarios").document(projectData["adminId"]).collection("projetos").document(projectData["projectId"]).setData(projectData);
 
-        notifyListeners();
+        userModel.loadProjects();
 
         onSuccess();
 
+        userModel.notifyListeners();
         isLoading = false;
         notifyListeners();
       }

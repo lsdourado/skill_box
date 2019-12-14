@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:keyboard_visibility/keyboard_visibility.dart';
 import 'package:scoped_model/scoped_model.dart';
@@ -21,12 +22,15 @@ class _AddProjectScreen extends State<AddProjectScreen> {
   final _descriptionController = TextEditingController();
 
   InterestModel _interestModel;
+  ProjectModel _projectModel;
 
   @override
   void initState() {
     super.initState();
     _interestModel = InterestModel.of(context);
     _interestModel.clearSelections();
+
+    _projectModel = ProjectModel.of(context);
 
     KeyboardVisibilityNotification().addNewListener(
       onHide: () {
@@ -184,11 +188,13 @@ class _AddProjectScreen extends State<AddProjectScreen> {
                                   ).toList();
 
                                   Map<String, dynamic> projectData = {
+                                    "adminId": _projectModel.userModel.user.userId,
                                     "titulo": _titleController.text,
                                     "descricao": _descriptionController.text,
+                                    "data_criacao": Timestamp.now()
                                   };
 
-                                  ProjectModel.of(context).addProject(
+                                  _projectModel.addProject(
                                     projectData: projectData,
                                     interestList: interests,
                                     onSuccess: onSuccess,

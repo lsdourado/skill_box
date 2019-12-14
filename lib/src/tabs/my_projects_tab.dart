@@ -10,20 +10,20 @@ class MyProjectsTab extends StatefulWidget {
 
 class _MyProjectsTab extends State<MyProjectsTab> {
 
-  UserModel _userModel;
   ProjectModel _projectModel;
+  UserModel _userModel;
 
   @override
   void initState() {
     super.initState();
-    _userModel = UserModel.of(context);
     _projectModel = ProjectModel.of(context);
+    _userModel = UserModel.of(context);
   }
   
   @override
   Widget build(BuildContext context) {
     if(_userModel.userLoggedIn){
-      if(_userModel.isLoading)
+      if(_userModel.isLoading || _projectModel.isLoading)
         return Center(child: CircularProgressIndicator());
       
       if(_userModel.user.projetos == null || _userModel.user.projetos.isEmpty)
@@ -56,6 +56,7 @@ class _MyProjectsTab extends State<MyProjectsTab> {
                     if(project.adminId == _userModel.user.userId){
                       return GestureDetector(
                         onTap: () {
+                          ProjectModel.project = project;
                           Navigator.of(context).push(
                             MaterialPageRoute(builder: (context)=>EditProjectScreen())
                           );
@@ -142,12 +143,15 @@ class _MyProjectsTab extends State<MyProjectsTab> {
               height: 225.0,
               child: ListView(
                 scrollDirection: Axis.horizontal,
-                children: _userModel.user.projetos.map(
+                children: _userModel.user.projetos.reversed.map(
                   (project){
                     if(project.adminId != _userModel.user.userId){
                       return GestureDetector(
                         onTap: (){
-                          print(project.titulo);
+                          ProjectModel.project = project;
+                          Navigator.of(context).push(
+                            MaterialPageRoute(builder: (context)=>EditProjectScreen())
+                          );
                         },
                         child: Container(
                           width: 300.0,
