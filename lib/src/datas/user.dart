@@ -13,6 +13,7 @@ class User {
   String telefone;
   List<Interest> interesses;
   List<Project> projetos;
+  List<Project> feed;
 
   User(FirebaseUser firebaseUser){
     this.userId = firebaseUser?.uid;
@@ -28,6 +29,8 @@ class User {
     emailSecundario = docUser.data["email_secundario"];
     telefone = docUser.data["telefone"];
     sobre = docUser.data["sobre"];
+    projetos = [];
+    feed = [];
   }
 
   Map<String, dynamic> toMap() {

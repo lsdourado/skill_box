@@ -8,8 +8,8 @@ class Project {
   String titulo;
   String descricao;
   Timestamp dataCriacao;
-  List<User> membros = [];
-  List<Interest> interesses = [];
+  List<User> membros;
+  List<Interest> interesses;
 
   //Project(this.adminId, this.projectId, this.titulo, this.descricao);
 
@@ -19,6 +19,8 @@ class Project {
     titulo = document.data["titulo"];
     descricao = document.data["descricao"];
     dataCriacao = document.data["data_criacao"];
+    interesses = [];
+    membros = [];
   }
 
   Project.fromMap(Map<String, dynamic> projectData) {
@@ -35,7 +37,9 @@ class Project {
       "projectId": projectId,
       "titulo": titulo,
       "descricao": descricao,
-      "dataCriacao": dataCriacao
+      "dataCriacao": dataCriacao,
+      "interesses": interesses.toList(),
+      "membros": membros.toList()
     };
   }
   

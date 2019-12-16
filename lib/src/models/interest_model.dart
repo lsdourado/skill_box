@@ -46,7 +46,9 @@ class InterestModel extends Model{
     ).toList();
   }
 
-  void setUserInterests(List<Interest> userInterests){
+  void setInterestsSelected(List<Interest> userInterests){
+    clearSelections();
+
     interestsSelected = userInterests;
 
     notifyListeners();

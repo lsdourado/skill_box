@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:skill_box/src/models/project_model.dart';
 import 'package:skill_box/src/screens/add_project_screen.dart';
 import 'package:skill_box/src/tabs/feed_tab.dart';
 import 'package:skill_box/src/tabs/my_projects_tab.dart';

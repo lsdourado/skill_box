@@ -18,6 +18,8 @@ class UserModel extends Model{
   bool isLoading = false;
   bool userLoggedIn = false;
 
+  static List<Project> feedProjects = [];
+
   static UserModel of(BuildContext context) => ScopedModel.of<UserModel>(context);
 
   @override
@@ -68,8 +70,8 @@ class UserModel extends Model{
 
   void signOut() async {
     isLoading = true;
-    await _googleSignIn.signOut();
     await _firebaseAuth.signOut();
+    await _googleSignIn.signOut();
 
     user = null;
     userLoggedIn = false;
@@ -86,20 +88,21 @@ class UserModel extends Model{
       if(user != null){
         if(user.interesses == null){
           if(await isLoggedIn()){
-            DocumentSnapshot docUser = await Firestore.instance.collection("usuarios").
+            DocumentSnapshot doc = await Firestore.instance.collection("usuarios").
             document(user.userId).get();
 
-            if(docUser.data != null)
-              user.fromDocument(docUser);
+            if(doc.data != null)
+              user.fromDocument(doc);
 
             QuerySnapshot query = await _firestore.collection("usuarios").document(user.userId).collection("interesses").getDocuments();
 
-            if(query.documents != null)
+            if(query.documents != null){
               user.interesses = query.documents.map((doc) => Interest.fromDocument(doc, true, doc.data["categoryId"])).toList();
 
-            query = await _firestore.collection("usuarios").document(user.userId).collection("projetos").getDocuments();
-
-            await loadProjects();
+              loadFeedProjects();
+              loadUserProjects();  
+            }
+               
           }
         }
       }
@@ -107,44 +110,93 @@ class UserModel extends Model{
     notifyListeners();
   }
 
-  Future<Null> loadProjects() async {
+  Future<Null> loadFeedProjects() async {
+    if(user?.interesses != null) {
+      user.feed = [];
+      user.interesses.map(
+        (userInterest) async {
+          QuerySnapshot query =  await _firestore.collection("projetos").where("interesses", arrayContains: userInterest.toMap()).getDocuments();
 
-    QuerySnapshot query = await _firestore.collection("usuarios").document(user.userId).collection("projetos").orderBy('data_criacao', descending: false).getDocuments();
+          if(query.documents != null){
+            query.documents.map(
+              (doc){
+                Project p = Project.fromDocument(doc);
+                
+                for(int i =0; i<doc.data["interesses"].length; i++){
+                  p.interesses.add(Interest(doc.data["interesses"][i]["categoryId"],doc.data["interesses"][i]["interestId"],true,doc.data["interesses"][i]["titulo"]));
+                }
 
-    if(query.documents != null){
-      user.projetos = query.documents.map((doc) => Project.fromDocument(doc)).toList();
+                for(int i =0; i<doc.data["membros"].length; i++){
+                  User u = User(null);
 
-      user.projetos.map(
-        (project) async {
-         query = await _firestore.collection("projetos").document(project.projectId).collection("interesses").getDocuments();
+                  u.userId = doc.data["membros"][i]["userId"];
+                  u.email = doc.data["membros"][i]["email"];
+                  u.emailSecundario = doc.data["membros"][i]["emailSecundario"];
+                  u.nome = doc.data["membros"][i]["nome"];
+                  u.sobre = doc.data["membros"][i]["sobre"];
+                  u.telefone = doc.data["membros"][i]["telefone"];
 
-         query.documents.map(
-           (doc){
-             project.interesses = query.documents.map((doc) => Interest.fromDocument(doc, true, doc.data["categoryId"])).toList();
-           }
-         ).toList();
+                  p.membros.add(u);
+                }
 
-         query = await _firestore.collection("projetos").document(project.projectId).collection("membros").getDocuments();
+                bool projectExists = false;
+                for(int i=0; i<user.feed.length; i++){
+                  if(user.feed[i].projectId == p.projectId)
+                    projectExists = true;
+                }
 
-         query.documents.map(
-           (doc){
-             User user = User(null);
-
-             user.fromDocument(doc);
-
-             project.membros.add(user);
-           }
-         ).toList();
+                if(!projectExists && p.adminId != user.userId){
+                  user.feed.add(p);
+                }
+              }
+            ).toList();
+          }
+          user.feed.sort((a, b) => b.dataCriacao.compareTo(a.dataCriacao));
         }
       ).toList();
     }
   }
 
+  Future<Null> loadUserProjects() async {
+    QuerySnapshot query = await _firestore.collection("projetos").where("membros", arrayContains: user.toMap()).getDocuments();
+
+    if(query.documents != null){
+      List<Project> projects = [];
+
+      query.documents.map(
+        (doc){
+          Project p =  Project.fromDocument(doc);
+          
+          for(int i =0; i<doc.data["interesses"].length; i++){
+            p.interesses.add(Interest(doc.data["interesses"][i]["categoryId"],doc.data["interesses"][i]["interestId"],true,doc.data["interesses"][i]["titulo"]));
+          }
+
+          for(int i =0; i<doc.data["membros"].length; i++){
+            User u = User(null);
+
+            u.userId = doc.data["membros"][i]["userId"];
+            u.email = doc.data["membros"][i]["email"];
+            u.emailSecundario = doc.data["membros"][i]["emailSecundario"];
+            u.nome = doc.data["membros"][i]["nome"];
+            u.sobre = doc.data["membros"][i]["sobre"];
+            u.telefone = doc.data["membros"][i]["telefone"];
+
+            p.membros.add(u);
+          }
+
+          projects.add(p);
+        }
+      ).toList();
+      user.projetos = projects;
+      user.projetos.sort((a, b) => b.dataCriacao.compareTo(a.dataCriacao));
+    }
+  }
+
   bool userHasProfile(){
-    if(user.interesses != null && user.interesses.isNotEmpty){
-      return true;
-    }else{
+    if(user.interesses == null || user.interesses.isEmpty){
       return false;
+    }else{
+      return true;
     }
   }
  
@@ -178,6 +230,8 @@ class UserModel extends Model{
         user.telefone = userData["telefone"];
         user.sobre = userData["sobre"];
         user.interesses = newInterests;
+
+        await loadFeedProjects();
 
         onSuccess();
 

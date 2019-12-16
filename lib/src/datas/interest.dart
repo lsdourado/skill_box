@@ -6,7 +6,7 @@ class Interest {
   String titulo;
   bool isSelected;
 
-  Interest();
+  Interest(this.categoryId,this.interestId,this.isSelected,this.titulo);
 
   Interest.fromDocument(DocumentSnapshot document, bool isSelected, String categoryId) {
     this.categoryId = categoryId;

@@ -30,7 +30,7 @@ class _MyProjectsTab extends State<MyProjectsTab> {
         return Center(child: Text("Você não possui projetos ainda"));
 
       else{
-        return ListView(
+        return Column(
           children: <Widget>[
             Row(
               children: <Widget>[
@@ -51,7 +51,7 @@ class _MyProjectsTab extends State<MyProjectsTab> {
               height: 225.0,
               child: ListView(
                 scrollDirection: Axis.horizontal,
-                children: _userModel.user.projetos.reversed.map(
+                children: _userModel.user.projetos.map(
                   (project){
                     if(project.adminId == _userModel.user.userId){
                       return GestureDetector(
@@ -66,7 +66,6 @@ class _MyProjectsTab extends State<MyProjectsTab> {
                           padding: EdgeInsets.symmetric(horizontal: 15.0, vertical: 15.0),
                           margin: EdgeInsets.all(10.0),
                           decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(15.0),
                             color: Colors.blueAccent,
                             border: Border.all(
                               color:Colors.grey.withOpacity(0.5)
@@ -127,7 +126,7 @@ class _MyProjectsTab extends State<MyProjectsTab> {
             Row(
               children: <Widget>[
                 Container(
-                  padding: EdgeInsets.only(left: 20.0, top: 20.0),
+                  padding: EdgeInsets.only(left: 20.0, top: 10.0),
                   child: Text(
                     "Que você participa",
                     style: TextStyle(
@@ -143,15 +142,12 @@ class _MyProjectsTab extends State<MyProjectsTab> {
               height: 225.0,
               child: ListView(
                 scrollDirection: Axis.horizontal,
-                children: _userModel.user.projetos.reversed.map(
+                children: _userModel.user.projetos.map(
                   (project){
                     if(project.adminId != _userModel.user.userId){
                       return GestureDetector(
                         onTap: (){
-                          ProjectModel.project = project;
-                          Navigator.of(context).push(
-                            MaterialPageRoute(builder: (context)=>EditProjectScreen())
-                          );
+                          print(project.titulo);
                         },
                         child: Container(
                           width: 300.0,

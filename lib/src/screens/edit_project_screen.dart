@@ -39,13 +39,13 @@ class _EditProjectScreen extends State<EditProjectScreen> {
       }
     );
 
-    _interestModel = InterestModel.of(context);
-    _interestModel.clearSelections();
-
     _projectModel = ProjectModel.of(context);
     
     _titleController.text = ProjectModel.project?.titulo;
     _descriptionController.text = ProjectModel.project?.descricao;
+
+    _interestModel = InterestModel.of(context);
+    _interestModel.setInterestsSelected(ProjectModel.project?.interesses);
   }
 
   @override
@@ -53,7 +53,7 @@ class _EditProjectScreen extends State<EditProjectScreen> {
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
-        title: Text("Novo projeto"),
+        title: Text("Editar projeto"),
         centerTitle: true,
       ),
       body: _interestModel.isLoading || _projectModel.isLoading ? Center(child: CircularProgressIndicator()) :
@@ -100,10 +100,12 @@ class _EditProjectScreen extends State<EditProjectScreen> {
                           child: ExpansionTile(
                             title: Text("Áreas de interesse"),
                             leading: Icon(Icons.list),
+                            initiallyExpanded: ProjectModel.project.interesses != null && ProjectModel.project.interesses.isNotEmpty ? true : false,
                             children: _interestModel.interestCategories.map(
                               (category){
                                 return Ink(
                                   child: ExpansionTile(
+                                    initiallyExpanded: _interestModel.isCategorySelected(category) ? true : false,
                                     title: Text(
                                       category.titulo,
                                     ),
@@ -117,6 +119,13 @@ class _EditProjectScreen extends State<EditProjectScreen> {
                                                 controller: _scrollController,
                                                 children: category.interests.map(
                                                   (interest){
+                                                    model.interestsSelected.map(
+                                                      (projectInterest){
+                                                        if(projectInterest.interestId == interest.interestId){
+                                                          interest.isSelected = projectInterest.isSelected;
+                                                        }
+                                                      }
+                                                    ).toList();
                                                     return GestureDetector(
                                                       child: Ink(
                                                         color: interest.isSelected ? Colors.green[200] : Colors.grey[100],
@@ -153,20 +162,6 @@ class _EditProjectScreen extends State<EditProjectScreen> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: <Widget>[
-                            RaisedButton(
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
-                              child: Text(
-                                "Cancelar",
-                                style: TextStyle(
-                                  fontSize: 18.0
-                                ),
-                              ),
-                              textColor: Colors.white,
-                              color: Colors.red,
-                              onPressed: (){
-                                Navigator.pop(context);
-                              }
-                            ),
                             SizedBox(width: 15.0),
                             RaisedButton(
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
@@ -196,12 +191,11 @@ class _EditProjectScreen extends State<EditProjectScreen> {
                                     "projectId": ProjectModel.project.projectId,
                                     "titulo": _titleController.text,
                                     "descricao": _descriptionController.text,
-                                    "data_criacao": ProjectModel.project.dataCriacao
+                                    "interesses": interests.map((Interest) => Interest.toMap()).toList(),
                                   };
 
                                   ProjectModel.of(context).saveProject(
                                     projectData: projectData,
-                                    interestList: interests,
                                     onSuccess: onSuccess,
                                     onFail: onFail
                                   );
@@ -226,7 +220,7 @@ class _EditProjectScreen extends State<EditProjectScreen> {
 
   void onFail(){
     _scaffoldKey.currentState.showSnackBar(
-      SnackBar(content: Text("Falha ao tentar adicionar"),
+      SnackBar(content: Text("Falha ao tentar alterar"),
       backgroundColor: Colors.redAccent,
       duration: Duration(seconds: 3),)
     );

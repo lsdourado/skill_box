@@ -3,10 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:keyboard_visibility/keyboard_visibility.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:skill_box/src/datas/interest.dart';
+import 'package:skill_box/src/datas/user.dart';
 import 'package:skill_box/src/models/interest_model.dart';
 import 'package:skill_box/src/models/project_model.dart';
 
 class AddProjectScreen extends StatefulWidget {
+
   @override
   _AddProjectScreen createState() => _AddProjectScreen();
 }
@@ -187,16 +189,19 @@ class _AddProjectScreen extends State<AddProjectScreen> {
                                     }
                                   ).toList();
 
+                                  List<User> membros = [_projectModel.userModel.user];
+
                                   Map<String, dynamic> projectData = {
                                     "adminId": _projectModel.userModel.user.userId,
                                     "titulo": _titleController.text,
                                     "descricao": _descriptionController.text,
-                                    "data_criacao": Timestamp.now()
+                                    "data_criacao": Timestamp.now(),
+                                    "interesses": interests.map((Interest) => Interest.toMap()).toList(),
+                                    "membros": membros.map((User) => User.toMap()).toList()
                                   };
 
                                   _projectModel.addProject(
                                     projectData: projectData,
-                                    interestList: interests,
                                     onSuccess: onSuccess,
                                     onFail: onFail
                                   );

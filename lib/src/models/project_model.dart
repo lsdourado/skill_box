@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
-import 'package:skill_box/src/datas/interest.dart';
 import 'package:skill_box/src/datas/project.dart';
 import 'package:skill_box/src/models/user_model.dart';
 
@@ -10,6 +9,8 @@ class ProjectModel extends Model{
   UserModel userModel;
 
   bool isLoading = false;
+
+  List<Project> feedProjects = [];
 
   static Project project;
 
@@ -33,61 +34,66 @@ class ProjectModel extends Model{
   }
 
 
-  Future<Null> addProject({@required Map<String, dynamic> projectData, @required List<Interest> interestList,@required VoidCallback onSuccess, @required VoidCallback onFail}) async {
-    isLoading = true;
-    notifyListeners();
+Future<Null> addProject({@required Map<String, dynamic> projectData,@required VoidCallback onSuccess, @required VoidCallback onFail}) async {
+  userModel.isLoading = true;
+  userModel.notifyListeners();
+  isLoading = true;
+  notifyListeners();
 
-    await _firestore.collection("projetos").add(projectData).then(
-      (result) async {
-        projectData["projectId"] = result.documentID;
+  await _firestore.collection("projetos").add(projectData).then(
+    (result) async {
+      projectData["projectId"] = result.documentID;
 
-        interestList.map(
-          (interest) async {
-            if(interest.isSelected == true){
-              await _firestore.collection("projetos").document(result.documentID).
-              collection("interesses").document(interest.interestId).setData(interest.toMap());
-            }
-          }
-        ).toList();
+      await _firestore.collection("usuarios").document(userModel.user?.userId).collection("projetos").document(result.documentID).setData({
+        "projectId": result.documentID
+      });
 
-        await _firestore.collection("projetos").document(result.documentID).collection("membros").document(projectData["adminId"]).setData(userModel.user?.toMap());
+      userModel.loadUserProjects();
 
-        await _firestore.collection("usuarios").document(userModel.user?.userId).collection("projetos").document(result.documentID).setData(projectData);
+      onSuccess();
 
-        userModel.loadProjects();
-
-        onSuccess();
-
-        userModel.notifyListeners();
-        isLoading = false;
-        notifyListeners();
-      }
-    ).catchError((e){
-      onFail();
+      userModel.isLoading = false;
+      userModel.notifyListeners();
       isLoading = false;
       notifyListeners();
-    });
-  }
+    }
+  ).catchError((e){
+    onFail();
+    userModel.isLoading = false;
+    userModel.notifyListeners();
+    isLoading = false;
+    notifyListeners();
+  });
+}
 
-  Future<Null> saveProject({@required Map<String, dynamic> projectData, @required List<Interest> interestList,@required VoidCallback onSuccess, @required VoidCallback onFail}) async {
+  Future<Null> saveProject({@required Map<String, dynamic> projectData,@required VoidCallback onSuccess, @required VoidCallback onFail}) async {
+    userModel.isLoading = true;
+    userModel.notifyListeners();
     isLoading = true;
     notifyListeners();
 
-    await _firestore.collection("projetos").document(projectData["projectId"]).setData(projectData).then(
-      (result) async {
-
-        await _firestore.collection("usuarios").document(projectData["adminId"]).collection("projetos").document(projectData["projectId"]).setData(projectData);
-
-        userModel.loadProjects();
-
+    await _firestore.collection("projetos").document(projectData["projectId"]).updateData(
+      {
+        "adminId": projectData["adminId"],
+        "projectId": projectData["projectId"],
+        "titulo": projectData["titulo"],
+        "descricao": projectData["descricao"],
+        "interesses": projectData["interesses"]
+      }
+    ).then(
+      (result) {
+        userModel.loadUserProjects();
         onSuccess();
 
+        userModel.isLoading = false;
         userModel.notifyListeners();
         isLoading = false;
         notifyListeners();
       }
     ).catchError((e){
       onFail();
+      userModel.isLoading = false;
+      userModel.notifyListeners();
       isLoading = false;
       notifyListeners();
     });
