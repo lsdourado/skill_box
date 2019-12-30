@@ -13,7 +13,6 @@ class User {
   String telefone;
   List<Interest> interesses;
   List<Project> projetos;
-  List<Project> feed;
 
   User(FirebaseUser firebaseUser){
     this.userId = firebaseUser?.uid;
@@ -26,11 +25,11 @@ class User {
     userId = docUser.documentID;
     nome = docUser.data["nome"];
     email = docUser.data["email"];
-    emailSecundario = docUser.data["email_secundario"];
+    emailSecundario = docUser.data["emailSecundario"];
     telefone = docUser.data["telefone"];
     sobre = docUser.data["sobre"];
+    urlFoto = docUser.data["urlFoto"];
     projetos = [];
-    feed = [];
   }
 
   Map<String, dynamic> toMap() {
@@ -41,6 +40,7 @@ class User {
       "emailSecundario": emailSecundario,
       "sobre": sobre,
       "telefone": telefone,
+      "urlFoto": urlFoto
     };
   }
 }

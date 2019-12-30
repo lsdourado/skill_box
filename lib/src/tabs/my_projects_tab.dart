@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:skill_box/src/models/project_model.dart';
 import 'package:skill_box/src/models/user_model.dart';
+import 'package:skill_box/src/screens/add_project_screen.dart';
 import 'package:skill_box/src/screens/edit_project_screen.dart';
+import 'package:skill_box/src/widgets/detail_project_dialog.dart';
 
 class MyProjectsTab extends StatefulWidget {
   @override
@@ -10,27 +12,32 @@ class MyProjectsTab extends StatefulWidget {
 
 class _MyProjectsTab extends State<MyProjectsTab> {
 
-  ProjectModel _projectModel;
   UserModel _userModel;
+  ProjectModel _projectModel;
 
   @override
   void initState() {
     super.initState();
-    _projectModel = ProjectModel.of(context);
     _userModel = UserModel.of(context);
+    _projectModel = ProjectModel.of(context);
   }
   
   @override
   Widget build(BuildContext context) {
-    if(_userModel.userLoggedIn){
-      if(_userModel.isLoading || _projectModel.isLoading)
-        return Center(child: CircularProgressIndicator());
-      
-      if(_userModel.user.projetos == null || _userModel.user.projetos.isEmpty)
-        return Center(child: Text("Você não possui projetos ainda"));
-
-      else{
-        return Column(
+    return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.deepPurple,
+        mini: true,
+        child: Icon(Icons.add),
+        onPressed: (){
+          Navigator.of(context).push(
+            MaterialPageRoute(builder: (context)=>AddProjectScreen())
+          );
+        },
+      ),
+      body: _userModel.isLoading ? Center(child: CircularProgressIndicator()) : 
+        _userModel.user.projetos == null || _userModel.user.projetos.isEmpty ? Center(child: Text("Você não possui projetos ainda")) : 
+        Column(
           children: <Widget>[
             Row(
               children: <Widget>[
@@ -48,7 +55,7 @@ class _MyProjectsTab extends State<MyProjectsTab> {
             ),
             Container(
               padding: EdgeInsets.all(10.0),
-              height: 225.0,
+              height: 230.0,
               child: ListView(
                 scrollDirection: Axis.horizontal,
                 children: _userModel.user.projetos.map(
@@ -56,64 +63,124 @@ class _MyProjectsTab extends State<MyProjectsTab> {
                     if(project.adminId == _userModel.user.userId){
                       return GestureDetector(
                         onTap: () {
-                          ProjectModel.project = project;
-                          Navigator.of(context).push(
-                            MaterialPageRoute(builder: (context)=>EditProjectScreen())
+                          showDialog(
+                            context: context,
+                            builder: (context){
+                              return DetailProjectDialog(project, _projectModel, false);
+                            }
                           );
                         },
                         child: Container(
                           width: 300.0,
-                          padding: EdgeInsets.symmetric(horizontal: 15.0, vertical: 15.0),
                           margin: EdgeInsets.all(10.0),
                           decoration: BoxDecoration(
-                            color: Colors.blueAccent,
+                            borderRadius: BorderRadius.all(Radius.circular(15.0)),
                             border: Border.all(
-                              color:Colors.grey.withOpacity(0.5)
+                              width: 0.5,
+                              color:Colors.deepPurple
                             )
                           ),
                           child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: <Widget>[
-                                Text(
-                                  "Título",
-                                    style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 16.0,
-                                    color: Colors.white
-                                  ),
-                                ),
-                                Flexible(
-                                  child: Text(
-                                    project.titulo,
-                                    style: TextStyle(
-                                      color: Colors.white
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: <Widget>[
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: <Widget>[
+                                  Container(
+                                    height: 35.0,
+                                    decoration: BoxDecoration(
+                                      color: Colors.deepPurple[400],
+                                      borderRadius: BorderRadius.only(topLeft: Radius.circular(15.0), topRight: Radius.circular(15.0)),
                                     ),
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                                SizedBox(
-                                  height: 12.0,
-                                ),
-                                Text(
-                                  "Descrição",
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 16.0,
-                                    color: Colors.white
-                                  ),
-                                ),
-                                Flexible(
-                                  child: Text(
-                                    project.descricao,
-                                    style: TextStyle(
-                                      color: Colors.white
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      children: <Widget>[
+                                        PopupMenuButton<String>(
+                                          icon: Icon(Icons.subject, color: Colors.white,),
+                                          onSelected: (String result){
+                                            switch (result) {
+                                              case "editar":
+                                                ProjectModel.project = project;
+                                                Navigator.of(context).push(
+                                                  MaterialPageRoute(builder: (context)=>EditProjectScreen())
+                                                );
+                                              break;
+                                              case "sair":
+                                                print("sair");
+                                              break;
+                                              case "excluir":
+                                                print("excluir");
+                                              break;
+                                            }
+                                          },
+                                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(15.0))),
+                                          itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+                                            const PopupMenuItem(
+                                              value: "editar",
+                                              child: Text('Editar')
+                                            ),
+                                            const PopupMenuItem(
+                                              value: "sair",
+                                              child: Text('Sair do projeto'),
+                                            ),
+                                            const PopupMenuItem(
+                                              value: "excluir",
+                                              child: Text('Excluir'),
+                                            ),
+                                          ]
+                                        )
+                                      ],
                                     ),
-                                    maxLines: 3,
-                                    overflow: TextOverflow.ellipsis,
                                   ),
+                                  Padding(
+                                    padding: EdgeInsets.symmetric(horizontal: 15.0, vertical: 5.0),
+                                    child: Text(
+                                      project.titulo,
+                                      overflow: TextOverflow.fade,
+                                      maxLines: 5,
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 14.0,
+                                      ),
+                                    )
+                                  ),
+                                  Padding(
+                                    padding: EdgeInsets.symmetric(horizontal: 15.0, vertical: 5.0),
+                                    child: Text(
+                                      project.descricao,
+                                      maxLines: 5,
+                                      overflow: TextOverflow.fade,
+                                      style: TextStyle(
+                                        color: Colors.grey[500]
+                                      ),
+                                    )
+                                  ),
+                                ],
+                              ),
+                              Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 15.0, vertical: 5.0),
+                                child: Column(
+                                  children: <Widget>[
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      children: <Widget>[
+                                        Text(
+                                          project.membros.length > 1 ? project.membros.length.toString() + " membros" : project.membros.length.toString() + " membro",
+                                        ),
+                                        Text(
+                                          " - ${project.dataCriacao.toDate().day}/${project.dataCriacao.toDate().month}/${project.dataCriacao.toDate().year}",
+                                          style: TextStyle(
+                                            fontStyle: FontStyle.italic,
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                  ],
                                 )
-                              ],
-                            )
+                              )
+                            ],
+                          )
                         )
                       );
                     }else{
@@ -139,7 +206,7 @@ class _MyProjectsTab extends State<MyProjectsTab> {
             ),
             Container(
               padding: EdgeInsets.all(10.0),
-              height: 225.0,
+              height: 230.0,
               child: ListView(
                 scrollDirection: Axis.horizontal,
                 children: _userModel.user.projetos.map(
@@ -147,53 +214,98 @@ class _MyProjectsTab extends State<MyProjectsTab> {
                     if(project.adminId != _userModel.user.userId){
                       return GestureDetector(
                         onTap: (){
-                          print(project.titulo);
+                          showDialog(
+                            context: context,
+                            builder: (context){
+                              return DetailProjectDialog(project, _projectModel, false);
+                            }
+                          );
                         },
                         child: Container(
                           width: 300.0,
-                          padding: EdgeInsets.symmetric(horizontal: 15.0, vertical: 15.0),
                           margin: EdgeInsets.all(10.0),
                           decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(15.0),
+                            borderRadius: BorderRadius.all(Radius.circular(15.0)),
                             border: Border.all(
-                              color:Colors.grey.withOpacity(0.5)
+                              width: 0.5,
+                              color:Colors.deepPurple
                             )
                           ),
                           child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: <Widget>[
-                                Text(
-                                  "Título",
-                                    style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 16.0,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: <Widget>[
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: <Widget>[
+                                  Container(
+                                    height: 35.0,
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      children: <Widget>[
+                                        PopupMenuButton<String>(
+                                          icon: Icon(Icons.subject, color: Colors.deepPurple),
+                                          onSelected: (String result){
+                                            if(result == "sair"){
+                                              ProjectModel.project = project;
+                                              _projectModel.removeMember(_projectModel.userModel.user);
+                                            }
+                                          },
+                                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(15.0))),
+                                          itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+                                            const PopupMenuItem(
+                                              value: "sair",
+                                              child: Text('Sair do projeto'),
+                                            ),
+                                          ]
+                                        )
+                                      ],
+                                    ),
                                   ),
-                                ),
-                                Flexible(
-                                  child: Text(
-                                    project.titulo,
-                                    overflow: TextOverflow.ellipsis,
+                                  Padding(
+                                    padding: EdgeInsets.symmetric(horizontal: 15.0),
+                                    child: Text(
+                                      project.titulo,
+                                      overflow: TextOverflow.ellipsis,
+                                      maxLines: 3,
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 14.0,
+                                      ),
+                                    )
                                   ),
-                                ),
-                                SizedBox(
-                                  height: 12.0,
-                                ),
-                                Text(
-                                  "Descrição",
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 16.0,
+                                  Padding(
+                                    padding: EdgeInsets.symmetric(horizontal: 15.0, vertical: 10.0),
+                                    child: Text(
+                                      project.descricao,
+                                      maxLines: 3,
+                                      overflow: TextOverflow.fade,
+                                      style: TextStyle(
+                                        color: Colors.grey[500]
+                                      ),
+                                    )
                                   ),
-                                ),
-                                Flexible(
-                                  child: Text(
-                                    project.descricao,
-                                    maxLines: 3,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
+                                ],
+                              ),
+                              Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 15.0, vertical: 5.0),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: <Widget>[
+                                    Text(
+                                      project.membros.length > 1 ? project.membros.length.toString() + " membros" : project.membros.length.toString() + " membro",
+                                    ),
+                                    Text(
+                                      " - ${project.dataCriacao.toDate().day}/${project.dataCriacao.toDate().month}/${project.dataCriacao.toDate().year}",
+                                      style: TextStyle(
+                                        fontStyle: FontStyle.italic,
+                                      ),
+                                    )
+                                  ],
                                 )
-                              ],
-                            )
+                              )
+                            ],
+                          )
                         )
                       );
                     }else{
@@ -204,10 +316,7 @@ class _MyProjectsTab extends State<MyProjectsTab> {
               ),
             ),
           ],
-        );
-      }
-    }else{
-      return Container();
-    }
+        )
+    );
   }
 }

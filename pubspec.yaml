@@ -31,6 +31,7 @@ dependencies:
   firebase_auth: 
   google_sign_in: 
   keyboard_visibility: ^0.5.6
+  configurable_expansion_tile: ^1.0.0
 
 dev_dependencies:
   flutter_test:

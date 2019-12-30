@@ -75,7 +75,7 @@ class CustomDrawer extends StatelessWidget {
                         size: 20.0
                       ),
                       mini: true,
-                      backgroundColor: Colors.redAccent,
+                      backgroundColor: Colors.red,
                     ),
                     )
                   ],

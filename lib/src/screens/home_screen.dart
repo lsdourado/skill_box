@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:skill_box/src/models/project_model.dart';
-import 'package:skill_box/src/screens/add_project_screen.dart';
 import 'package:skill_box/src/tabs/feed_tab.dart';
 import 'package:skill_box/src/tabs/my_projects_tab.dart';
 import 'package:skill_box/src/tabs/profile_tab.dart';
 import 'package:skill_box/src/widgets/custom_drawer.dart';
+import 'package:skill_box/src/widgets/notifications_icon.dart';
 
 class HomeScreen extends StatelessWidget {
 
@@ -16,39 +15,32 @@ class HomeScreen extends StatelessWidget {
       physics: NeverScrollableScrollPhysics(),
       controller: _pageController,
       children: <Widget>[
-        Scaffold(
-          appBar: AppBar(
-            title: Text("Home"),
-            centerTitle: true,
-          ),
-          body: FeedTab(),
-          drawer: CustomDrawer(_pageController),
-        ),
-        Scaffold(
-          floatingActionButton: FloatingActionButton(
-            child: Icon(Icons.add),
-            onPressed: (){
-              Navigator.of(context).push(
-                MaterialPageRoute(builder: (context)=>AddProjectScreen())
-              );
-            },
-          ),
-          appBar: AppBar(
-            title: Text("Meus projetos"),
-            centerTitle: true,
-          ),
-          body: MyProjectsTab(),
-          drawer: CustomDrawer(_pageController),
-        ),
-        Scaffold(
-          appBar: AppBar(
-            title: Text("Perfil de usuário"),
-            centerTitle: true,
-          ),
-          body: ProfileTab(),
-          drawer: CustomDrawer(_pageController),
-        ),
+        _buildPage(FeedTab(), "Home"),
+
+        _buildPage(MyProjectsTab(), "Meus projetos"),
+
+        _buildPage(ProfileTab(), "Perfil de usuário"),
+
       ],
+    );
+  }
+
+  Widget _buildPage(Widget tab, String titulo){
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.deepPurple,
+        title: Text(
+          titulo,
+          style: TextStyle(color: Colors.white),
+        ),
+        centerTitle: true,
+        actions: <Widget>[
+          NotificationsIcon()
+        ],
+        iconTheme: IconThemeData(color: Colors.white),
+      ),
+      body: tab,
+      drawer: CustomDrawer(_pageController),
     );
   }
 }

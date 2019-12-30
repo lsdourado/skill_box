@@ -10,6 +10,7 @@ class Project {
   Timestamp dataCriacao;
   List<User> membros;
   List<Interest> interesses;
+  List<User> convites;
 
   //Project(this.adminId, this.projectId, this.titulo, this.descricao);
 
@@ -21,6 +22,7 @@ class Project {
     dataCriacao = document.data["data_criacao"];
     interesses = [];
     membros = [];
+    convites = [];
   }
 
   Project.fromMap(Map<String, dynamic> projectData) {
