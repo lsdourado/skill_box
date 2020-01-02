@@ -41,7 +41,7 @@ class InterestModel extends Model{
       (categoria) async {
         query = await _firestore.collection("interesses").document(categoria.categoryId).collection("itens").getDocuments();
         
-        categoria.interests = query.documents.map((doc) => Interest.fromDocument(doc, false, categoria.categoryId)).toList();
+        categoria.interests = query.documents.map((doc) => Interest.fromDocument(doc, false)).toList();
       }
     ).toList();
   }

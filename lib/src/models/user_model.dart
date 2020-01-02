@@ -98,10 +98,9 @@ class UserModel extends Model{
             QuerySnapshot query = await _firestore.collection("usuarios").document(user.userId).collection("interesses").getDocuments();
 
             if(query.documents != null){
-              user.interesses = query.documents.map((doc) => Interest.fromDocument(doc, true, doc.data["categoryId"])).toList();
+              user.interesses = query.documents.map((doc) => Interest.fromDocument(doc, true)).toList();
 
               loadFeedProjects();
-              loadUserProjects();  
             }
                
           }
@@ -119,14 +118,14 @@ class UserModel extends Model{
       user.interesses.map(
         (userInterest) async {
           QuerySnapshot query =  await _firestore.collection("projetos").where("interesses", arrayContains: userInterest.toMap()).getDocuments();
-
+          
           if(query.documents != null){
             query.documents.map(
               (doc){
                 Project p = Project.fromDocument(doc);
                 
                 for(int i =0; i<doc.data["interesses"].length; i++){
-                  p.interesses.add(Interest(doc.data["interesses"][i]["categoryId"],doc.data["interesses"][i]["interestId"],true,doc.data["interesses"][i]["titulo"]));
+                  p.interesses.add(Interest.fromDynamic(doc.data["interesses"][i], true));
                 }
 
                 bool isMember = false;
@@ -166,51 +165,6 @@ class UserModel extends Model{
           feedProjects.sort((a, b) => b.dataCriacao.compareTo(a.dataCriacao));
         }
       ).toList();
-      
-      isLoading = false;
-      notifyListeners();
-    }
-
-    notifyListeners();
-  }
-
-  Future<Null> loadUserProjects() async {
-    isLoading = true;
-    notifyListeners();
-    QuerySnapshot query = await _firestore.collection("projetos").where("membros", arrayContains: user.toMap()).getDocuments();
-    
-    if(query.documents != null){
-      List<Project> projects = [];
-
-      query.documents.map(
-        (doc){
-          Project p =  Project.fromDocument(doc);
-          
-          for(int i =0; i<doc.data["interesses"].length; i++){
-            p.interesses.add(Interest(doc.data["interesses"][i]["categoryId"],doc.data["interesses"][i]["interestId"],true,doc.data["interesses"][i]["titulo"]));
-          }
-
-          if(doc.data["membros"] != null){
-            for(int i =0; i<doc.data["membros"].length; i++){
-              User u = User(null);
-
-              u.userId = doc.data["membros"][i]["userId"];
-              u.email = doc.data["membros"][i]["email"];
-              u.emailSecundario = doc.data["membros"][i]["emailSecundario"];
-              u.nome = doc.data["membros"][i]["nome"];
-              u.sobre = doc.data["membros"][i]["sobre"];
-              u.telefone = doc.data["membros"][i]["telefone"];
-              u.urlFoto = doc.data["membros"][i]["urlFoto"];
-
-              p.membros.add(u);
-            }
-          }
-
-          projects.add(p);
-        }
-      ).toList();
-      user.projetos = projects;
-      user.projetos.sort((a, b) => b.dataCriacao.compareTo(a.dataCriacao));
     }
 
     isLoading = false;
@@ -256,8 +210,6 @@ class UserModel extends Model{
         user.sobre = userData["sobre"];
         user.urlFoto = userData["urlFoto"];
         user.interesses = newInterests;
-
-        await loadFeedProjects();
 
         onSuccess();
 

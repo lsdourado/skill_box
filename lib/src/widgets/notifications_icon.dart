@@ -1,8 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:skill_box/src/datas/project.dart';
 import 'package:skill_box/src/models/user_model.dart';
-import 'package:skill_box/src/screens/notifications_screen.dart';
 
 class NotificationsIcon extends StatefulWidget {
   @override
@@ -12,11 +10,8 @@ class NotificationsIcon extends StatefulWidget {
 class _NotificationsIconState extends State<NotificationsIcon> {
   UserModel _userModel;
 
-  final ScrollController _scrollController = ScrollController();
-
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
 
     _userModel = UserModel.of(context);
@@ -26,53 +21,46 @@ class _NotificationsIconState extends State<NotificationsIcon> {
   Widget build(BuildContext context) {
     if(_userModel.userLoggedIn){
       if(!_userModel.isLoading){
-        return GestureDetector(
-          onTap: (){
-            Navigator.of(context).push(
-              MaterialPageRoute(builder: (context)=>NotificationsScreen())
-            );
-          },
-          child: Padding(
-            padding: EdgeInsets.only(right: 10.0, top: 15.0),
-            child: Stack(
-              alignment: Alignment.topCenter,
-              children: <Widget>[
-                Padding(
-                  padding: EdgeInsets.only(right: 25.0),
-                  child: Icon(Icons.notifications)
-                ),
-                StreamBuilder<QuerySnapshot>(
-                  stream: _userModel.checkNotificationQuantity(),
-                  builder: (context, snapshot){
-                    if(snapshot.hasData){
-                      if(snapshot.data.documents.length > 0){
-                        return CircleAvatar(
-                          backgroundColor: Colors.red,
-                          radius: 8.0,
-                          child: Text(
-                            snapshot.data.documents.length.toString(),
-                            textAlign: TextAlign.center,
-                            style: TextStyle(color: Colors.white, fontSize: 13.0, fontWeight: FontWeight.bold)
+        return Stack(
+          alignment: Alignment.center,
+          children: <Widget>[
+            Icon(Icons.notifications, color: Colors.white, size: 20.0),
+            Padding(
+              padding: EdgeInsets.only(left: 20.0, bottom: 10.0),
+              child: StreamBuilder<QuerySnapshot>(
+                stream: _userModel.checkNotificationQuantity(),
+                builder: (context, snapshot){
+                  if(snapshot.hasData){
+                    if(snapshot.data.documents.length > 0){
+                      return Row(
+                        mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Container(
+                            padding: EdgeInsets.all(2.0),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.all(Radius.circular(15.0)),
+                              color: Colors.redAccent
+                            ),
+                            child: Text(
+                              snapshot.data.documents.length.toString(),
+                              textAlign: TextAlign.center,
+                              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)
+                            )
                           )
-                        );
-                      }
+                        ],
+                      );
                     }
-                    return Container();
-                  },
-                )
-              ],
+                  }
+                  return Container();
+                },
+              )
             )
-          )
+          ],
         );
       }
     }
 
-    return Align(
-      alignment: Alignment.topCenter,
-      child: Padding(
-        padding: EdgeInsets.only(right: 35.0, top: 15.0),
-        child: Icon(Icons.notifications)
-      )
-    );
+    return Icon(Icons.notifications, color: Colors.white, size: 20.0);
   }
 }

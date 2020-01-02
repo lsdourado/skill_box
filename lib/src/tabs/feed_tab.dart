@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:configurable_expansion_tile/configurable_expansion_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:skill_box/src/models/project_model.dart';
@@ -16,8 +14,6 @@ class _FeedTabState extends State<FeedTab> {
   UserModel _userModel;
   ProjectModel _projectModel;
 
-  final _scaffoldKey = GlobalKey<ScaffoldState>();
-
   @override
   void initState() {
     super.initState();
@@ -30,25 +26,22 @@ class _FeedTabState extends State<FeedTab> {
     if(_userModel.userLoggedIn){
       if(_userModel.isLoading)
         return Center(child: CircularProgressIndicator());
-      return Scaffold(
-        key: _scaffoldKey,
-        body: RefreshIndicator(
+      return RefreshIndicator(
           displacement: 20.0,
           onRefresh: () async {
-            await _userModel.loadFeedProjects();
+            _userModel.loadFeedProjects();
           },
           child: ListView(
             children: _userModel.user.interesses.map(
               (userInterest){
-
-                int quantProject = 0;
+                bool hasProject = false;
 
                 UserModel.feedProjects.map(
                   (project){
                     project.interesses.map(
                       (projectInterest){
                         if(projectInterest.interestId == userInterest.interestId){
-                          quantProject++;
+                          hasProject = true;
                         }
                       }
                     ).toList();
@@ -76,47 +69,40 @@ class _FeedTabState extends State<FeedTab> {
                                   ),
                                 ),
                               ),
-                              Text(
-                                  quantProject == 1 ? " (" + quantProject.toString() + " projeto)" : " (" + quantProject.toString() + " projetos)",
-                                  style: TextStyle(
-                                    fontStyle: FontStyle.italic,
-                                    fontSize: 12.0,
-                                    color: Colors.blueGrey
-                                  ),
-                                )
                             ],
                           )
                         ),
                         children: <Widget>[
-                          quantProject > 0 ? Container(
+                          hasProject ? Container(
                             height: 230.0,
                             child: ListView(
                               scrollDirection: Axis.horizontal,
                               children: UserModel.feedProjects.map(
                                 (project){
-                                  quantProject = 0;
+                                  bool hasInterest = false;
 
                                   project.interesses.map(
                                     (projectInterest){
                                       if(projectInterest.interestId == userInterest.interestId){
-                                        quantProject++;
+                                        hasInterest = true;
                                       }
                                     }
                                   ).toList();
 
-                                  if(quantProject > 0){
+                                  if(hasInterest){
                                     return GestureDetector(
                                       onTap: () {
                                         showDialog(
                                           context: context,
                                           builder: (context){
-                                            return DetailProjectDialog(project, _projectModel, true);
+                                            ProjectModel.project = project;
+                                            return DetailProjectDialog();
                                           }
                                         );
                                       },
                                       child: Container(
                                         width: 300.0,
-                                        margin: EdgeInsets.all(10.0),
+                                        margin: EdgeInsets.only(top: 10.0, right: 10.0, bottom: 10.0),
                                         decoration: BoxDecoration(
                                           borderRadius: BorderRadius.all(Radius.circular(15.0)),
                                           border: Border.all(
@@ -140,8 +126,8 @@ class _FeedTabState extends State<FeedTab> {
                                                   ),
                                                   child: Text(
                                                       project.titulo,
-                                                      overflow: TextOverflow.fade,
-                                                      maxLines: 5,
+                                                      overflow: TextOverflow.ellipsis,
+                                                      maxLines: 3,
                                                       style: TextStyle(
                                                         fontWeight: FontWeight.bold,
                                                         fontSize: 14.0,
@@ -198,8 +184,7 @@ class _FeedTabState extends State<FeedTab> {
               }
             ).toList()
           )
-        )
-      );
+        );
     }else{
       return Container();
     }

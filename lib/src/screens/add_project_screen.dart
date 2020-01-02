@@ -87,7 +87,7 @@ class _AddProjectScreen extends State<AddProjectScreen> {
                         Padding(
                           padding: EdgeInsets.only(top: 8.0, bottom: 8.0),
                           child: TextFormField(
-                            maxLines: 5,
+                            maxLines: 10,
                             controller: _descriptionController,
                             decoration: InputDecoration(
                               alignLabelWithHint: true,
@@ -110,7 +110,7 @@ class _AddProjectScreen extends State<AddProjectScreen> {
                                   children: <Widget>[
                                     Icon(Icons.list),
                                     Text(
-                                      " ÁREAS DE INTERESSE",
+                                      " Interesses",
                                       style: TextStyle(
                                         fontWeight: FontWeight.bold,
                                       ),
@@ -215,22 +215,7 @@ class _AddProjectScreen extends State<AddProjectScreen> {
                               RaisedButton(
                                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
                                 child: Text(
-                                  "Cancelar",
-                                  style: TextStyle(
-                                    fontSize: 18.0
-                                  ),
-                                ),
-                                textColor: Colors.white,
-                                color: Colors.red,
-                                onPressed: (){
-                                  Navigator.pop(context);
-                                }
-                              ),
-                              SizedBox(width: 15.0),
-                              RaisedButton(
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
-                                child: Text(
-                                  "Salvar",
+                                  "Adicionar",
                                   style: TextStyle(
                                     fontSize: 18.0
                                   ),
@@ -256,7 +241,7 @@ class _AddProjectScreen extends State<AddProjectScreen> {
                                     "adminId": _projectModel.userModel.user.userId,
                                     "titulo": _titleController.text,
                                     "descricao": _descriptionController.text,
-                                    "data_criacao": Timestamp.now(),
+                                    "dataCriacao": Timestamp.now(),
                                     "interesses": interests.map((Interest) => Interest.toMap()).toList(),
                                     "membros": membros.map((User) => User.toMap()).toList()
                                   };

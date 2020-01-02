@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:configurable_expansion_tile/configurable_expansion_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:keyboard_visibility/keyboard_visibility.dart';
@@ -6,7 +5,6 @@ import 'package:scoped_model/scoped_model.dart';
 import 'package:skill_box/src/datas/interest.dart';
 import 'package:skill_box/src/models/interest_model.dart';
 import 'package:skill_box/src/models/project_model.dart';
-import 'package:skill_box/src/models/user_model.dart';
 
 class EditProjectScreen extends StatefulWidget {
   @override
@@ -89,7 +87,7 @@ class _EditProjectScreen extends State<EditProjectScreen> {
                       Padding(
                         padding: EdgeInsets.only(top: 8.0, bottom: 8.0),
                         child: TextFormField(
-                          maxLines: 5,
+                          maxLines: 10,
                           controller: _descriptionController,
                           decoration: InputDecoration(
                             alignLabelWithHint: true,
@@ -105,6 +103,7 @@ class _EditProjectScreen extends State<EditProjectScreen> {
                       Padding(
                         padding: EdgeInsets.only(top: 8.0, bottom: 16.0),
                         child: ConfigurableExpansionTile(
+                            initiallyExpanded: ProjectModel.project.interesses.length > 0 ? true : false,
                             header: Flexible(
                               child: Padding(
                                 padding: EdgeInsets.symmetric(vertical: 10.0),
@@ -112,7 +111,7 @@ class _EditProjectScreen extends State<EditProjectScreen> {
                                   children: <Widget>[
                                     Icon(Icons.list),
                                     Text(
-                                      " ÁREAS DE INTERESSE",
+                                      " Interesses",
                                       style: TextStyle(
                                         fontWeight: FontWeight.bold,
                                       ),

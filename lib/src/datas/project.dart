@@ -12,14 +12,12 @@ class Project {
   List<Interest> interesses;
   List<User> convites;
 
-  //Project(this.adminId, this.projectId, this.titulo, this.descricao);
-
   Project.fromDocument(DocumentSnapshot document) {
     projectId = document.documentID;
     adminId = document.data["adminId"];
     titulo = document.data["titulo"];
     descricao = document.data["descricao"];
-    dataCriacao = document.data["data_criacao"];
+    dataCriacao = document.data["dataCriacao"];
     interesses = [];
     membros = [];
     convites = [];

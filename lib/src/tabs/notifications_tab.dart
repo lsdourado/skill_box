@@ -1,21 +1,19 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:skill_box/src/datas/user.dart';
 import 'package:skill_box/src/models/project_model.dart';
 import 'package:skill_box/src/models/user_model.dart';
 
-class NotificationsScreen extends StatefulWidget {
+class NotificationsTab extends StatefulWidget {
   @override
-  _NotificationsScreenState createState() => _NotificationsScreenState();
+  _NotificationsTabState createState() => _NotificationsTabState();
 }
 
-class _NotificationsScreenState extends State<NotificationsScreen> {
+class _NotificationsTabState extends State<NotificationsTab> {
   UserModel _userModel;
   ProjectModel _projectModel;
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
 
     _userModel = UserModel.of(context);
@@ -25,19 +23,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   }
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        iconTheme: IconThemeData(
-          color: Colors.white
-        ),
-        backgroundColor: Colors.deepPurple,
-        title: Text(
-          "Notificações",
-          style: TextStyle(color: Colors.white),
-        ),
-        centerTitle: true,
-      ),
-      body: StreamBuilder<QuerySnapshot>(
+    return StreamBuilder<QuerySnapshot>(
         stream: _userModel.listNotifications(),
         builder: (context,snapshot){
           if(snapshot.hasData && snapshot.data.documents.length > 0 && !_userModel.isLoading){
@@ -45,35 +31,32 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               children: <Widget>[
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
-                  child: Container(
-                    margin: EdgeInsets.only(right: 150.0),
-                    height: 30.0,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(20.0),
-                      color: Colors.grey[200],
-                      border: new Border.all(
-                        color: Colors.grey[300],
-                        style: BorderStyle.solid
-                      )
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        Text(
-                          "Solicitações de participação ",
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold
-                          ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: <Widget>[
+                      Chip(
+                        elevation: 4.0,
+                        label: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: <Widget>[
+                            Text(
+                              "Notificações de participação: ",
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold
+                              ),
+                            ),
+                            Text(
+                              snapshot.data.documents.length.toString(),
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.redAccent
+                              ),
+                            )
+                          ],
                         ),
-                        Text(
-                          snapshot.data.documents.length.toString(),
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.red
-                          ),
-                        )
-                      ],
-                    )
+                      )
+                    ],
                   )
                 ),
                 Column(
@@ -97,31 +80,36 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                                     ),
                                     Padding(
                                       padding: EdgeInsets.only(left: 10.0),
-                                        child: Text(
-                                        invite.data["nome"],
-                                        style: TextStyle(fontWeight: FontWeight.bold),
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: <Widget>[
+                                          Text(
+                                            invite.data["nome"],
+                                            style: TextStyle(fontWeight: FontWeight.bold),
+                                          ),
+                                          Text(
+                                            "pediu para participar do projeto"
+                                          )
+                                        ],
                                       )
                                     ),
-                                    Text(
-                                      " pediu para participar do projeto"
-                                    )
                                   ],
                                 ),
                                 Padding(
-                                  padding: EdgeInsets.only(left: 50.0),
+                                  padding: EdgeInsets.only(left: 50.0, top: 5.0),
                                   child: Row(
-                                  children: <Widget>[
-                                    Flexible(
-                                      child: Text(
-                                        invite.data["projectTitle"],
-                                        style: TextStyle(
-                                          fontStyle: FontStyle.italic
-                                        ),
-                                        overflow: TextOverflow.visible,
+                                    children: <Widget>[
+                                      Flexible(
+                                        child: Text(
+                                          invite.data["projectTitle"],
+                                          style: TextStyle(
+                                            fontStyle: FontStyle.italic
+                                          ),
+                                          overflow: TextOverflow.visible,
+                                        )
                                       )
-                                    )
-                                  ],
-                                )
+                                    ],
+                                  )
                                 )
                               ],
                             ),
@@ -182,7 +170,6 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             );
           }
         },
-      )
-    );
+      );
   }
 }

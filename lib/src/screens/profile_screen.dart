@@ -5,15 +5,14 @@ import 'package:scoped_model/scoped_model.dart';
 import 'package:skill_box/src/datas/interest.dart';
 import 'package:skill_box/src/models/interest_model.dart';
 import 'package:skill_box/src/models/user_model.dart';
-import 'package:skill_box/src/screens/home_screen.dart';
 import 'package:skill_box/src/screens/login_screen.dart';
 
-class ProfileTab extends StatefulWidget {
+class ProfileScreen extends StatefulWidget {
   @override
-  _ProfileTabState createState() => _ProfileTabState();
+  _ProfileScreenState createState() => _ProfileScreenState();
 }
 
-class _ProfileTabState extends State<ProfileTab> {
+class _ProfileScreenState extends State<ProfileScreen> {
 
   final _formKey = GlobalKey<FormState>();
   final _scaffoldKey = GlobalKey<ScaffoldState>();
@@ -55,9 +54,15 @@ class _ProfileTabState extends State<ProfileTab> {
   Widget build(BuildContext context) {
     if(_userModel.userLoggedIn){
       return Scaffold(
-        appBar: _userModel.userHasProfile() ? null : AppBar(
-          title: Text("Perfil de usuário"),
+        appBar: AppBar(
+          title: Text(
+            "Perfil de usuário",
+            style: TextStyle(
+              color: Colors.white
+            ),
+          ),
           centerTitle: true,
+          backgroundColor: Colors.deepPurple,
         ),
         key: _scaffoldKey,
         body: _interestModel.isLoading ? Center(child: CircularProgressIndicator()) :
@@ -138,6 +143,7 @@ class _ProfileTabState extends State<ProfileTab> {
                   Padding(
                     padding: EdgeInsets.only(top: 8.0, bottom: 16.0),
                     child: ConfigurableExpansionTile(
+                        initiallyExpanded: _userModel.user.interesses.length > 0 ? true : false,
                         header: Flexible(
                           child: Padding(
                             padding: EdgeInsets.symmetric(vertical: 10.0),
@@ -145,7 +151,7 @@ class _ProfileTabState extends State<ProfileTab> {
                               children: <Widget>[
                                 Icon(Icons.list),
                                 Text(
-                                  " ÁREAS DE INTERESSE",
+                                  " Interesses",
                                   style: TextStyle(
                                     fontWeight: FontWeight.bold,
                                   ),
@@ -322,9 +328,7 @@ class _ProfileTabState extends State<ProfileTab> {
   }
 
   void onSuccess(){
-    Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context)=>HomeScreen())
-      );
+    Navigator.pop(context);
   }
 
   void onFail(){

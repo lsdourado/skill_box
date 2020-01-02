@@ -28,8 +28,7 @@ void main() async {
                       return MaterialApp(
                         title: "Skill Box",
                         theme: ThemeData(
-                          primarySwatch: Colors.blue,
-                          primaryColor: Colors.lightBlue,
+                          primaryColor: Colors.deepPurple,
                         ),
                         debugShowCheckedModeBanner: false,
                         home: isLoggedIn ? HomeScreen() : LoginScreen(),

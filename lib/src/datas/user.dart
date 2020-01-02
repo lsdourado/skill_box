@@ -1,8 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:skill_box/src/datas/interest.dart';
-import 'package:skill_box/src/datas/project.dart';
-
 class User {
   String userId;
   String urlFoto;
@@ -12,7 +10,6 @@ class User {
   String sobre;
   String telefone;
   List<Interest> interesses;
-  List<Project> projetos;
 
   User(FirebaseUser firebaseUser){
     this.userId = firebaseUser?.uid;
@@ -29,7 +26,16 @@ class User {
     telefone = docUser.data["telefone"];
     sobre = docUser.data["sobre"];
     urlFoto = docUser.data["urlFoto"];
-    projetos = [];
+  }
+
+  void fromDynamic(userData) {
+    userId = userData["userId"];
+    nome = userData["nome"];
+    email = userData["email"];
+    emailSecundario = userData["emailSecundario"];
+    telefone = userData["telefone"];
+    sobre = userData["sobre"];
+    urlFoto = userData["urlFoto"];
   }
 
   Map<String, dynamic> toMap() {
