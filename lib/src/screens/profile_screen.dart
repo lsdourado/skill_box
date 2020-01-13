@@ -46,7 +46,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         if(!currentFocus.hasPrimaryFocus) {
           currentFocus.unfocus();
         }
-      }
+      },
     );
   }
 
@@ -75,7 +75,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               Column(
                 children: <Widget>[
                   CircleAvatar(
-                    radius: 50.0,
+                    radius: 40.0,
                     backgroundColor: Colors.grey[400],
                     foregroundColor: Colors.black,
                     backgroundImage: UserModel.of(context).user != null ? NetworkImage(UserModel.of(context).user.urlFoto) : null,
@@ -84,7 +84,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   Text(
                     UserModel.of(context).user?.nome,
                     style: TextStyle(
-                      fontSize: 17.0,
+                      fontSize: 15.0,
                       fontWeight: FontWeight.w500
                     ),
                   ),
@@ -92,7 +92,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   Text(
                     UserModel.of(context).user?.email,
                     style: TextStyle(
-                      fontSize: 17.0,
+                      fontSize: 15.0,
                       fontWeight: FontWeight.w500
                     ),
                   ),

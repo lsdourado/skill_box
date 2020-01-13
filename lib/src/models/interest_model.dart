@@ -9,6 +9,9 @@ class InterestModel extends Model{
 
   bool isLoading = false;
 
+  static Interest filterInterest;
+  String filterCategoryId;
+
   List<InterestCategory> interestCategories = [];
 
   List<Interest> interestsSelected = [];
@@ -61,6 +64,7 @@ class InterestModel extends Model{
           if(category.categoryId == interest.categoryId){
             if(interest.isSelected){
               category.isSelected = true;
+              filterCategoryId = interest.categoryId;
             }else{
               category.isSelected = false;
             }
@@ -87,6 +91,17 @@ class InterestModel extends Model{
     if(!find){
       interest.isSelected = !interest.isSelected;
     }
+    notifyListeners();
+  }
+
+  void onTapFilterInterest(Interest interest){
+    if(filterInterest != null && filterInterest.interestId == interest.interestId){
+      filterInterest = null;
+    }else{
+      filterCategoryId = interest.categoryId;
+      filterInterest = interest;
+    }
+    
     notifyListeners();
   }
 

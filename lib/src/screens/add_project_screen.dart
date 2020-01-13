@@ -235,15 +235,12 @@ class _AddProjectScreen extends State<AddProjectScreen> {
                                     }
                                   ).toList();
 
-                                  List<User> membros = [_projectModel.userModel.user];
-
                                   Map<String, dynamic> projectData = {
                                     "adminId": _projectModel.userModel.user.userId,
                                     "titulo": _titleController.text,
                                     "descricao": _descriptionController.text,
-                                    "dataCriacao": Timestamp.now(),
                                     "interesses": interests.map((Interest) => Interest.toMap()).toList(),
-                                    "membros": membros.map((User) => User.toMap()).toList()
+                                    "dataCriacao": Timestamp.now().toDate().toUtc()
                                   };
 
                                   _projectModel.addProject(

@@ -27,12 +27,20 @@ dependencies:
   cloud_firestore: 
   firebase_analytics: 
   firebase_messaging: 
+  firebase_storage: ^3.1.1
   scoped_model: ^0.3.0
   firebase_auth: 
   google_sign_in: 
   keyboard_visibility: ^0.5.6
   configurable_expansion_tile: ^1.0.0
   curved_navigation_bar: ^0.3.1
+  image_picker: ^0.6.2+3
+  file_picker: ^1.4.3+2
+  http: ^0.12.0+4
+  path_provider: ^1.5.1
+  open_file: ^2.1.1
+  photo_view: ^0.9.0
+  url_launcher: ^5.4.1
 
 dev_dependencies:
   flutter_test:

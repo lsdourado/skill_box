@@ -24,7 +24,7 @@ class _NotificationsIconState extends State<NotificationsIcon> {
         return Stack(
           alignment: Alignment.center,
           children: <Widget>[
-            Icon(Icons.notifications, color: Colors.white, size: 20.0),
+            Icon(Icons.notifications, color: Colors.white, size: 30.0),
             Padding(
               padding: EdgeInsets.only(left: 20.0, bottom: 10.0),
               child: StreamBuilder<QuerySnapshot>(
@@ -61,6 +61,6 @@ class _NotificationsIconState extends State<NotificationsIcon> {
       }
     }
 
-    return Icon(Icons.notifications, color: Colors.white, size: 20.0);
+    return Icon(Icons.notifications, color: Colors.white, size: 30.0);
   }
 }

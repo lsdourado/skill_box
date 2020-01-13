@@ -3,6 +3,7 @@ import 'package:skill_box/src/models/user_model.dart';
 import 'package:skill_box/src/datas/project.dart';
 import 'package:skill_box/src/datas/user.dart';
 import 'package:skill_box/src/models/project_model.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class SwitchAdminDialog extends StatefulWidget {
   @override
@@ -45,19 +46,28 @@ class _SwitchAdminDialogState extends State<SwitchAdminDialog> {
                               selectedMember = member;
                             });
                           },
-                          child: Chip(
-                            backgroundColor: selectedMember.userId == member.userId ? Colors.deepPurple[200] : null,
-                            avatar: CircleAvatar(
-                              backgroundColor: Colors.grey[400],
-                              foregroundColor: Colors.black,
-                              backgroundImage: NetworkImage(member.urlFoto),
-                            ),
-                            label: Text(
-                              member.nome,
-                              style: TextStyle(
-                                color: selectedMember.userId == member.userId ? Colors.white : null
-                              ),
-                            )
+                          child: StreamBuilder<DocumentSnapshot>(
+                            stream: _userModel.getUserInfo(localUser: member),
+                            builder: (context, memberSnapshot){
+                              if(memberSnapshot.hasData){
+                                return Chip(
+                                  backgroundColor: selectedMember.userId == member.userId ? Colors.deepPurple[200] : null,
+                                  avatar: CircleAvatar(
+                                    backgroundColor: Colors.grey[400],
+                                    foregroundColor: Colors.black,
+                                    backgroundImage: NetworkImage(memberSnapshot.data["urlFoto"]),
+                                  ),
+                                  label: Text(
+                                    memberSnapshot.data["nome"],
+                                    style: TextStyle(
+                                      color: selectedMember.userId == member.userId ? Colors.white : null
+                                    ),
+                                  )
+                                );
+                              }else{
+                                return Container();
+                              }
+                            },
                           )
                         );
                       }else{
@@ -84,11 +94,9 @@ class _SwitchAdminDialogState extends State<SwitchAdminDialog> {
           splashColor: Colors.transparent,
           textColor: Colors.deepPurple,
           onPressed: (){
-            _projectModel.switchAdminProject(selectedMember).then(
-              (resultSwitch){
-                _projectModel.leaveProject(_userModel.user);
-              }
-            );
+            _projectModel.switchAdminProject(selectedMember);
+            _projectModel.leaveProject();
+            
             Navigator.pop(context, true);
           },
           child: Text("OK"),

@@ -11,7 +11,7 @@ class UserModel extends Model{
 
   final _firebaseAuth = FirebaseAuth.instance;
   final _firestore = Firestore.instance;
-  final _googleSignIn = GoogleSignIn();
+  final googleSignIn = GoogleSignIn();
 
   User user;
 
@@ -35,7 +35,7 @@ class UserModel extends Model{
     isLoading = true;
     notifyListeners();
 
-    final googleUser = await _googleSignIn.signIn();
+    final googleUser = await googleSignIn.signIn();
     final googleAuth = await googleUser.authentication;
 
     final AuthCredential credential = GoogleAuthProvider.getCredential(
@@ -71,7 +71,7 @@ class UserModel extends Model{
   void signOut() async {
     isLoading = true;
     await _firebaseAuth.signOut();
-    await _googleSignIn.signOut();
+    await googleSignIn.signOut();
 
     user = null;
     userLoggedIn = false;
@@ -100,6 +100,8 @@ class UserModel extends Model{
             if(query.documents != null){
               user.interesses = query.documents.map((doc) => Interest.fromDocument(doc, true)).toList();
 
+              user.interesses.sort((a, b) => a.titulo.toLowerCase().compareTo(b.titulo.toLowerCase()));
+
               loadFeedProjects();
             }
                
@@ -121,7 +123,7 @@ class UserModel extends Model{
           
           if(query.documents != null){
             query.documents.map(
-              (doc){
+              (doc) async {
                 Project p = Project.fromDocument(doc);
                 
                 for(int i =0; i<doc.data["interesses"].length; i++){
@@ -130,24 +132,22 @@ class UserModel extends Model{
 
                 bool isMember = false;
 
-                if(doc.data["membros"] != null){
-                  for(int i =0; i<doc.data["membros"].length; i++){
-                    User u = User(null);
+                query = await _firestore.collection("projetos").document(doc.documentID).collection("membros").getDocuments();
 
-                    if(doc.data["membros"][i]["userId"] == user.userId){
-                      isMember = true;
+                if(query.documents != null){
+                  query.documents.map(
+                    (docMember){
+                      User u = User(null);
+
+                      u.fromDocument(docMember);
+
+                      if(docMember.data["userId"] == user.userId){
+                        isMember = true;
+                      }
+
+                      p.membros.add(u);
                     }
-
-                    u.userId = doc.data["membros"][i]["userId"];
-                    u.email = doc.data["membros"][i]["email"];
-                    u.emailSecundario = doc.data["membros"][i]["emailSecundario"];
-                    u.nome = doc.data["membros"][i]["nome"];
-                    u.sobre = doc.data["membros"][i]["sobre"];
-                    u.telefone = doc.data["membros"][i]["telefone"];
-                    u.urlFoto = doc.data["membros"][i]["urlFoto"];
-
-                    p.membros.add(u);
-                  }
+                  ).toList();
                 }
 
                 bool projectExists = false;
@@ -158,11 +158,12 @@ class UserModel extends Model{
 
                 if(!projectExists && p.adminId != user.userId && !isMember){
                   feedProjects.add(p);
+                  feedProjects.sort((a, b) => b.dataCriacao.toDate().toLocal().compareTo(a.dataCriacao.toDate().toLocal()));
+                  notifyListeners();
                 }
               }
             ).toList();
           }
-          feedProjects.sort((a, b) => b.dataCriacao.compareTo(a.dataCriacao));
         }
       ).toList();
     }
@@ -230,10 +231,7 @@ class UserModel extends Model{
     return _firestore.collection("usuarios").document(user.userId).collection("convites").snapshots();
   }
 
-  Future<Null> setNotificationsViewed() async {
-    isLoading = true;
-    notifyListeners();
-
+  void setNotificationsViewed() async {
     await _firestore.collection("usuarios").document(user.userId).collection("convites").where("visualizado", isEqualTo: false).getDocuments().then(
       (userInvites){
         if(userInvites.documents != null){
@@ -249,13 +247,22 @@ class UserModel extends Model{
         }
       }
     );
-
-    isLoading = false;
-    notifyListeners();
   }
 
   Future<Null> deleteInvite(String inviteId) async {
     await _firestore.collection("usuarios").document(user.userId).collection("convites").document(inviteId).delete();
+  }
+
+  Stream<DocumentSnapshot> getUserInfo({DocumentSnapshot docUser, User localUser}){
+   if(docUser != null){
+      return _firestore.collection("usuarios").document(docUser.data["userId"]).snapshots();
+   }else{
+      return _firestore.collection("usuarios").document(localUser.userId).snapshots();
+   }
+  }
+
+  Stream<QuerySnapshot> getUserInterests(DocumentSnapshot docUser) {
+    return _firestore.collection("usuarios").document(docUser.documentID).collection("interesses").snapshots();
   }
 
 }

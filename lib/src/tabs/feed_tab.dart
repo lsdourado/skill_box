@@ -65,7 +65,7 @@ class _FeedTabState extends State<FeedTab> {
                                   userInterest.titulo,
                                   style: TextStyle(
                                     fontWeight: FontWeight.bold,
-                                    fontSize: 20.0,
+                                    fontSize: 17.0,
                                   ),
                                 ),
                               ),

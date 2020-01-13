@@ -8,6 +8,8 @@ import 'package:skill_box/src/tabs/feed_tab.dart';
 import 'package:skill_box/src/tabs/my_projects_tab.dart';
 import 'package:skill_box/src/tabs/notifications_tab.dart';
 import 'package:skill_box/src/widgets/notifications_icon.dart';
+import 'package:skill_box/src/widgets/chat_notifications_icon.dart';
+import 'package:skill_box/src/tabs/search_tab.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -98,10 +100,10 @@ class _HomeScreenState extends State<HomeScreen> {
         animationCurve: Curves.bounceInOut,
         index: 2,
         items: <Widget>[
-          Icon(Icons.chat_bubble, size: 20.0, color: Colors.white),
-          Icon(Icons.featured_play_list, size: 20.0, color: Colors.white),
-          Icon(Icons.home, size: 20.0, color: Colors.white),
-          Icon(Icons.search, size: 20.0, color: Colors.white),
+          ChatNotificationsIcon(),
+          Icon(Icons.featured_play_list, size: 30.0, color: Colors.white),
+          Icon(Icons.home, size: 30.0, color: Colors.white),
+          Icon(Icons.search, size: 30.0, color: Colors.white),
           NotificationsIcon()
         ],
         onTap: (index){
@@ -140,7 +142,7 @@ class _HomeScreenState extends State<HomeScreen> {
         return MyProjectsTab();
       break;
       case 3:
-        return Container();
+        return SearchTab();
       break;
       case 4:
         return NotificationsTab();

@@ -37,9 +37,9 @@ class Project {
       "projectId": projectId,
       "titulo": titulo,
       "descricao": descricao,
-      "dataCriacao": dataCriacao,
       "interesses": interesses.toList(),
-      "membros": membros.toList()
+      "membros": membros.toList(),
+      "dataCriacao": dataCriacao
     };
   }
   
