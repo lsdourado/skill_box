@@ -238,6 +238,8 @@ class _TextComposerState extends State<TextComposer> {
     _textController.clear();
     setState(() {
       _isComposing = false;
+      imgFile = null;
+      docFile = null;
     });
   }
 

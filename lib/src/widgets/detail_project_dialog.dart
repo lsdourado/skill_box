@@ -357,25 +357,27 @@ class _DetailProjectDialogState extends State<DetailProjectDialog> {
                               )
                             ],
                           )
-                        ) : Align(
-                          alignment: Alignment.centerRight,
-                          child: Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 15.0),
-                            child: RaisedButton(
-                              highlightColor: Colors.transparent,
-                              splashColor: Colors.transparent,
-                              focusColor: Colors.transparent,
-                              focusElevation: 0,
-                              highlightElevation: 0,
-                              hoverElevation: 0,
-                              onPressed: null,
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
-                              child: Text(
-                                "Participando",
-                              ),
+                        ) : _project.adminId != _projectModel.userModel.user.userId ?
+                            Align(
+                            alignment: Alignment.centerRight,
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 15.0),
+                              child: RaisedButton(
+                                highlightColor: Colors.transparent,
+                                splashColor: Colors.transparent,
+                                focusColor: Colors.transparent,
+                                focusElevation: 0,
+                                highlightElevation: 0,
+                                hoverElevation: 0,
+                                onPressed: null,
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
+                                child: Text(
+                                  "Participando",
+                                ),
+                              )
                             )
                           )
-                        )
+                        : Container()
                       ],
                     );
                   }else{

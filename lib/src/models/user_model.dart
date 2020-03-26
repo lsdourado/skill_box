@@ -2,7 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+
 import 'package:scoped_model/scoped_model.dart';
+
 import 'package:skill_box/src/datas/interest.dart';
 import 'package:skill_box/src/datas/project.dart';
 import 'package:skill_box/src/datas/user.dart';
@@ -70,6 +72,8 @@ class UserModel extends Model{
 
   void signOut() async {
     isLoading = true;
+    notifyListeners();
+    
     await _firebaseAuth.signOut();
     await googleSignIn.signOut();
 
@@ -213,6 +217,8 @@ class UserModel extends Model{
         user.interesses = newInterests;
 
         onSuccess();
+
+        loadFeedProjects();
 
         notifyListeners();
       }

@@ -163,19 +163,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                       }
                                     ).toList(),
                                   ),
-                                  listMessagesCount == 0 ? 
-                                    Container(
-                                      margin: EdgeInsets.only(top: 10.0),
-                                      child: Chip(
-                                        elevation: 3.0,
-                                        backgroundColor: Colors.white,
-                                        label: Text(
-                                          isNotVisualizedSnapshot.data.documents.length == 1 ? isNotVisualizedSnapshot.data.documents.length.toString() + " mensagem não visualizada"
-                                          : isNotVisualizedSnapshot.data.documents.length.toString() + " mensagens não visualizadas"
-                                        ),
-                                      )
-                                    )
-                                  : Container(),
+                                  
                                   Column(
                                     children: snapshot.data.documents.map(
                                       (mensagem){

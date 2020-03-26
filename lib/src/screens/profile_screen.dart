@@ -5,6 +5,7 @@ import 'package:scoped_model/scoped_model.dart';
 import 'package:skill_box/src/datas/interest.dart';
 import 'package:skill_box/src/models/interest_model.dart';
 import 'package:skill_box/src/models/user_model.dart';
+import 'package:skill_box/src/screens/home_screen.dart';
 import 'package:skill_box/src/screens/login_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -23,6 +24,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final _phoneController = TextEditingController();
   final _aboutController = TextEditingController();
 
+  bool enableButton = false;
+
+  bool hasProfile;
+
   UserModel _userModel;
   InterestModel _interestModel;
 
@@ -38,6 +43,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
     _emailController.text = _userModel.user?.emailSecundario;
     _phoneController.text = _userModel.user?.telefone;
     _aboutController.text  = _userModel.user?.sobre;
+
+    hasProfile = _userModel.userHasProfile();
 
     KeyboardVisibilityNotification().addNewListener(
       onHide: () {
@@ -193,13 +200,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                           controller: _scrollController,
                                           children: category.interests.map(
                                             (interest){
-                                              model.interestsSelected.map(
-                                                (userInterest){
-                                                  if(userInterest.interestId == interest.interestId){
-                                                    interest.isSelected = userInterest.isSelected;
+                                              if(model.interestsSelected.length > 0){
+                                                enableButton = true;
+                                                model.interestsSelected.map(
+                                                  (userInterest){
+                                                    if(userInterest.interestId == interest.interestId){
+                                                      interest.isSelected = userInterest.isSelected;
+                                                    }
                                                   }
-                                                }
-                                              ).toList();
+                                                ).toList();
+                                              }else{
+                                                enableButton = false;
+                                              }
                                               return GestureDetector(
                                                 child: Padding(
                                                   padding: EdgeInsets.only(left: 25.0),
@@ -328,7 +340,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   void onSuccess(){
-    Navigator.pop(context);
+    if(hasProfile){
+      Navigator.pop(context);
+    }else{
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context)=>HomeScreen())
+      );
+    }
   }
 
   void onFail(){

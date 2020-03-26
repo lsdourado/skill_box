@@ -115,7 +115,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 title = "Conversas";
               break;
               case 1:
-                title = "Projetos"; 
+                title = "Meus Projetos"; 
               break;
               case 3:
                 title = "Busca"; 
